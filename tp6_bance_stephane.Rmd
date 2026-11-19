@@ -1,0 +1,140 @@
+---
+title: "tp6_bance_stephane"
+author: "Stéphane BANCE"
+output: 
+  html_document:
+    toc: TRUE
+---
+
+```{r include=FALSE}
+library("tidyverse")
+```
+
+
+# Partie A
+
+## A1
+
+nchar("Été 2026 "), renvoie la valeur 9.
+
+```{r}
+nchar("Été 2026 ")
+```
+
+str_sub("Conservatoire",-5), renvoie la chaine "toire"
+```{r}
+str_sub("Conservatoire",-5)
+```
+
+str_detect(c("a.b", "axb", "ab"), "a.b"), renvoie un vecteur [TRUE TRUE FALSE]
+```{r}
+str_detect(c("a.b", "axb", "ab"), "a.b")
+```
+
+str_detect(c("a.b", "axb", "ab"), "a\\.b"), renvoie un vecteur [TRUE FALSE FALSE]
+```{r}
+str_detect(c("a.b", "axb", "ab"), "a\\.b")
+```
+
+str_count("banana", "an"), renvoie la valeur 2.
+```{r}
+str_count("banana", "an")
+```
+
+str_replace("aaa", "a", "b"), renvoie la chaine "bbb"
+```{r}
+str_replace("aaa", "a", "b")
+```
+str_replace, remplace la première subchaine qui correspond et non toutes les subchaine, c'est pour ça que ma prédiction était érroné
+
+
+str_extract("Tel : 06 12 34 56 78", "\\d+"), renvoie la chaine "06"
+```{r}
+str_extract("Tel : 06 12 34 56 78", "\\d+")
+```
+
+str_split("a,b,,c", ","), Renvoie une liste avec les élément "a", "b", "", "c".
+```{r}
+str_split("a,b,,c", ",")
+```
+#A2
+a.
+```{r}
+villes <- c(" paris", "SAINT-ÉTIENNE ", "aix-en-provence", "Le Mans", "nîmes")
+
+villes_propre = villes |>str_trim() |> str_to_title()
+villes_propre
+```
+On obtient  "Aix-En-Provence" au lieu de  "Aix-en-provence". Car la function capitalise tous les mots.
+
+b.
+```{r}
+str_c(str_pad(villes_propre ,width = 20, side = "left"), " (", str_length(villes_propre), ")")
+```
+
+c.
+```{r}
+villes_propre |> 
+  iconv(from = "UTF-8", to = "ASCII//TRANSLIT") |>
+  str_to_upper() |>
+  str_replace_all(" ", "-")
+```
+## A3
+
+a.
+```{r}
+codes <- c("FR-2024-00123", "FR-2025-04567", "DE-2025-00089", "fr-2023-1", "FR2025-00999",
+"IT-2024-12345", "FR-2026-00042", "ES-2025-0071")
+
+r_code_valide <- "[A-Z]{2}-\\d{4}-\\d{5}"
+codes_valides <- codes[str_detect(codes, r_code_valide)]
+codes_valides
+```
+b.
+```{r}
+tib_codes <- codes_valides |> 
+  str_match("([A-Z]{2})-(\\d{4})-(\\d{5})") |> 
+  as_tibble() |> 
+  set_names(c("code","pays", "annee", "numéro")) |> 
+  select(-code)
+tib_codes
+```
+
+c.
+```{r}
+tib_codes_pays <- tib_codes |> 
+  group_by(pays) |> 
+  summarise(
+    n_code_valide = n()
+  )
+tib_codes_pays
+```
+
+`r paste(paste0(tib_codes_pays[["pays"]], " a ", tib_codes_pays[["n_code_valide"]], " code(s) valide(s)."), collapse = " ")`
+
+## A4
+
+```{r}
+x <- c("rapport.pdf", "photo.PNG", "notes.pdf.bak", "data_pdf")
+```
+
+str_subset(x, ".pdf"), le regex cherche ".pdf" partout dans la chaine est non seulement à la fin, il faut ajouter un $ derrière.
+```{r}
+str_subset(x, ".pdf$")
+```
+
+str_detect("prix : 1500 €", "^\\d+\$"), Ce regex cherche à savoir si la chaine est un nombre, au lieu de regarder partout il suffit de supprimer "^" et le "\$".
+```{r}
+str_detect("prix : 1500 €", "\\d+")
+```
+str_replace("2026-01-15", "(\\d+)-(\\d+)-(\\d+)", "\\3/\\2/\\1") est correcte.
+```{r}
+str_replace("2026-01-15", "(\\d+)-(\\d+)-(\\d+)", "\\3/\\2/\\1") 
+```
+
+str_detect(c("Photo", "photo"), "^photo"), Ce regex verife que les miniscule, il faut juste ajoute le cas de la majuscule
+```{r}
+str_detect(c("Photo", "photo"), "^(P|p)hoto")
+```
+
+# Partie B
