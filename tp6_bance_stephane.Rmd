@@ -149,7 +149,7 @@ Les ids suivent le même formats : "CXXX".
 
 Les différents formats des noms : "prenom nom", "PRENOM NOM", "Prenom Nom", "Prenom, Nom".
 
-Les différents formets de mails : "prenom.nom\@fournisseur.domain", "prenom.nomfournisseur.domain"
+Les différents formets de mails : "prenom.nom\@domain.com", "prenom.nomdomain.com"
 
 Les différents formats de numéro de téléphone : "XX XX XX XX XX", "XXXXXXXXXX", "XX.XX.XX.XX.XX", "XX-XX-XX-XX-XX".
 
@@ -234,7 +234,7 @@ contacts_bruts |>
     str_detect(contacts_bruts[["email"]], req_email)
   )|> 
 
-  group_by(extension =  str_match(email, "@([a-z0-9._-]+)\\.")[, 2]) |> 
+  group_by(domain =  str_match(email, "@([a-z0-9._-]+)\\.")[, 2]) |> 
   summarise(
     nb_contacts = n()
   ) |> 
@@ -256,7 +256,7 @@ contacts_bruts = contacts_bruts |>
       NA
     )
   )
-contacts_bruts
+head(contacts_bruts, 10)
 ```
 
 .b
@@ -334,7 +334,7 @@ contacts_bruts3 = contacts_bruts2 |>
       str_detect(inscription, "^\\d{2}-\\d{2}-\\d{2}$") ~ dmy(inscription)
     ))
   )
-contacts_bruts3
+head(contacts_bruts3, 10)
 ```
 
 c.
@@ -367,3 +367,165 @@ n_complets <- sum(complete.cases(contacts_propres))
 ```
 
 Il y a `r n_complets` contacts complets sur `r nrow(contacts_propres)`.
+
+
+# Partie C
+
+## C1
+
+```{r}
+lignes <- read_lines("data/journal_serveur.log")
+n_lignes <- length(lignes)
+n_niveaux <- c(
+  INFO = sum(str_detect(lignes, "\\[INFO\\]")),
+  WARN = sum(str_detect(lignes, "\\[WARN\\]")),
+  ERROR = sum(str_detect(lignes, "\\[ERROR\\]"))
+)
+n_niveaux
+```
+
+Le journal contient `r n_lignes` lignes : `r n_niveaux["INFO"]` INFO, `r n_niveaux["WARN"]` WARN et `r n_niveaux["ERROR"]` ERROR.
+
+## C2
+
+```{r}
+log <- tibble(ligne = lignes) |>
+  mutate(
+    horodatage = ymd_hms(str_sub(ligne, 1, 19)),
+    niveau = str_match(ligne, "\\[([A-Z]+)\\]")[, 2],
+    user = na_if(str_match(ligne, "user=(\\S+)")[, 2], "-"),
+    ip = str_match(ligne, "ip=(\\S+)")[, 2],
+    action = str_match(ligne, "action=(\\S+)")[, 2],
+    fichier = str_match(ligne, "fichier=(\\S+)")[, 2],
+    code = as.integer(str_match(ligne, "code=(\\d+)")[, 2]),
+    duree = as.numeric(str_match(ligne, "duree=(\\d+(?:\\.\\d+)?)ms")[, 2]),
+    msg = str_match(ligne, 'msg="([^"]*)"')[, 2]
+  ) |>
+  select(-ligne)
+
+log
+```
+
+## C3
+
+a.
+```{r}
+log |>
+  count(jour = as_date(horodatage), niveau) |>
+  pivot_wider(names_from = niveau, values_from = n, values_fill = 0)
+```
+b.
+```{r}
+heures = log |> 
+  group_by(
+    heure = hour(horodatage)
+  ) |> 
+  summarise(
+    n_requete = n()
+  ) |> 
+  arrange(
+    desc(n_requete)
+  )
+head(heures, 5)
+```
+
+Le serveur est le plus sollicité à `r heures$heure[1]` h, avec `r heures$n_requete[1]` requêtes sur les trois jours.
+
+c.
+```{r}
+erreurs_user <- log |>
+  filter(niveau == "ERROR", !is.na(user)) |>
+  count(user, sort = TRUE)
+head(erreurs_user, 5)
+
+part_anonyme <- mean(is.na(log$user))
+```
+
+Les utilisateurs qui ont le plus d'erreurs sont `r paste0(head(erreurs_user$user, 3), " (", head(erreurs_user$n, 3), ")", collapse = ", ")`. Les requêtes anonymes représentent `r round(100 * part_anonyme, 1)` % du total.
+
+## C4
+a.
+```{r}
+log |>
+  group_by(action) |>
+  summarise(
+    mediane = median(duree, na.rm = TRUE),
+    centile_90 = quantile(duree, 0.9, na.rm = TRUE)
+  )
+```
+b.
+```{r}
+mediane_niveau <- log |>
+  group_by(niveau) |>
+  summarise(mediane = median(duree, na.rm = TRUE))
+mediane_niveau
+```
+
+Oui, les requêtes erreurs sont les plus lentes avec une mediane de `r mediane_niveau[mediane_niveau$niveau == "ERROR", "mediane"]`. Soit `r round(mediane_niveau[mediane_niveau$niveau == "ERROR", "mediane"]/mean(mediane_niveau$mediane[mediane_niveau$niveau %in% c("INFO", "WARN")]), 2)` plus lent.
+
+
+c.
+Tableau des types de messages d'erreur : 
+```{r}
+messages <- log |>
+  filter(niveau == "ERROR", !is.na(msg)) |>
+  count(msg, sort = TRUE)
+messages
+```
+
+Les messages d'erreur sont : `r paste0(messages$msg, " (", messages$n, ")", collapse = " ; ")`.
+
+
+d.
+Classement des extensions de fichier les plus télécharger.
+```{r}
+top_telechargement <- log |> 
+  filter(action == "download",
+         code == "200",
+         !is.na(fichier)) |> 
+  group_by(
+    extension = str_match(fichier, "\\.([a-zA-Z]{2,5})$")[, 2],
+    fichier) |>
+  summarise(
+    n_telechargement = n(),
+    .groups = "drop_last"
+  ) |> 
+  arrange(
+    desc(n_telechargement)
+  )
+top_telechargement
+```
+
+## C5
+
+```{r}
+# a
+externes <- log |> filter(!str_detect(ip, "^192\\.168\\."))
+n_externes <- nrow(externes)
+n_ip_externes <- n_distinct(externes$ip)
+```
+
+`r n_externes` requêtes viennent de l'extérieur du réseau interne, depuis `r n_ip_externes` adresses distinctes.
+
+```{r}
+# b
+ip_externes <- externes |>
+  group_by(ip) |>
+  summarise(
+    requetes = n(),
+    utilisateurs = n_distinct(user, na.rm = TRUE),
+    erreurs = sum(niveau == "ERROR"),
+    refus = sum(code %in% c(401, 429))
+  ) |>
+  arrange(desc(refus), desc(erreurs))
+ip_externes
+
+suspecte <- ip_externes[1, ]
+```
+
+L'adresse la plus suspecte est `r suspecte$ip` : elle a envoyé `r suspecte$requetes` requêtes avec `r suspecte$utilisateurs` utilisateurs différents, et elle cumule `r suspecte$erreurs` erreurs et `r suspecte$refus` refus (401 ou 429), ce qui ressemble à des tentatives répétées d'accès non autorisé.
+
+```{r}
+# c
+all(str_detect(log$ip, "^(\\d{1,3}\\.){3}\\d{1,3}$"))
+```

@@ -372,6 +372,14 @@ display: none;
 <li><a href="#b6" id="toc-b6">B6</a></li>
 <li><a href="#b7" id="toc-b7">B7</a></li>
 </ul></li>
+<li><a href="#partie-c" id="toc-partie-c">Partie C</a>
+<ul>
+<li><a href="#c1" id="toc-c1">C1</a></li>
+<li><a href="#c2" id="toc-c2">C2</a></li>
+<li><a href="#c3" id="toc-c3">C3</a></li>
+<li><a href="#c4" id="toc-c4">C4</a></li>
+<li><a href="#c5" id="toc-c5">C5</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -543,8 +551,8 @@ head(contacts_bruts, 10)</code></pre>
 <p>Les ids suivent le même formats : “CXXX”.</p>
 <p>Les différents formats des noms : “prenom nom”, “PRENOM NOM”, “Prenom
 Nom”, “Prenom, Nom”.</p>
-<p>Les différents formets de mails : “prenom.nom@fournisseur.domain”,
-“prenom.nomfournisseur.domain”</p>
+<p>Les différents formets de mails : “prenom.nom@domain.com”,
+“prenom.nomdomain.com”</p>
 <p>Les différents formats de numéro de téléphone : “XX XX XX XX XX”,
 “XXXXXXXXXX”, “XX.XX.XX.XX.XX”, “XX-XX-XX-XX-XX”.</p>
 <p>Les différents formats de numéro d’adresse : “NUMERO lieu, CODEPOSTAL
@@ -871,21 +879,21 @@ req_email &lt;- &quot;^[a-z0-9._-]+@[a-z0-9._-]+\\.[a-z]{2,4}$&quot;</code></pre
     str_detect(contacts_bruts[[&quot;email&quot;]], req_email)
   )|&gt; 
 
-  group_by(extension =  str_match(email, &quot;@([a-z0-9._-]+)\\.&quot;)[, 2]) |&gt; 
+  group_by(domain =  str_match(email, &quot;@([a-z0-9._-]+)\\.&quot;)[, 2]) |&gt; 
   summarise(
     nb_contacts = n()
   ) |&gt; 
   
   arrange(desc(nb_contacts))</code></pre>
 <pre><code>## # A tibble: 6 × 2
-##   extension nb_contacts
-##   &lt;chr&gt;           &lt;int&gt;
-## 1 yahoo              15
-## 2 free               11
-## 3 lecnam              9
-## 4 outlook             8
-## 5 orange              7
-## 6 gmail               4</code></pre>
+##   domain  nb_contacts
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 yahoo            15
+## 2 free             11
+## 3 lecnam            9
+## 4 outlook           8
+## 5 orange            7
+## 6 gmail             4</code></pre>
 </div>
 <div id="b4" class="section level2">
 <h2>B4</h2>
@@ -901,190 +909,40 @@ req_email &lt;- &quot;^[a-z0-9._-]+@[a-z0-9._-]+\\.[a-z]{2,4}$&quot;</code></pre
       NA
     )
   )
-contacts_bruts</code></pre>
-<pre><code>##      id       nom                        email      telephone
-## 1  C001      fall        valerie.fall@yahoo.fr           &lt;NA&gt;
-## 2  C002    GIRARD          jade.girard@free.fr 04 50 22 51 38
-## 3  C003 Chevalier     chen.chevalier@orange.fr 01 02 23 14 73
-## 4  C004    ndiaye        awa.ndiaye@lecnam.net 01 98 84 59 09
-## 5  C005     Mbaye        gael.mbaye@lecnam.net 04 57 05 26 77
-## 6  C006    Benali      rokhaya.benali@yahoo.fr 06 40 95 18 29
-## 7  C007      Faye            awa.faye@yahoo.fr 07 24 33 72 04
-## 8  C008    Garcia    clemence.garcia@orange.fr 01 72 83 18 14
-## 9  C009    Martin       jade.martin@lecnam.net 06 08 50 10 27
-## 10 C010      Wang          moussa.wangyahoo.fr 07 73 32 60 45
-## 11 C011    DIALLO      quentin.diallo@yahoo.fr 01 12 11 86 38
-## 12 C012    Benali     rokhaya.benali@gmail.com 06 69 20 17 56
-## 13 C013      diop           sami.diop@yahoo.fr 06 52 63 68 30
-## 14 C014    Girard       djibril.girard@free.fr 04 69 18 79 54
-## 15 C015    DURAND         dina.durand@yahoo.fr 06 59 38 97 79
-## 16 C016    Benali         gael.benali@yahoo.fr 06 06 35 77 30
-## 17 C017      FALL     clemence.fall@outlook.fr 06 85 48 12 30
-## 18 C018    girard          theo.girard@free.fr 06 96 51 76 39
-## 19 C019   le goff     wassim.legoff@outlook.fr 06 05 94 24 24
-## 20 C020    Girard     pauline.girard@orange.fr 06 87 48 27 91
-## 21 C021      FALL       pauline.falloutlook.fr 06 62 74 15 59
-## 22 C022    NGUYEN        elias.nguyen@yahoo.fr 07 55 00 41 42
-## 23 C023  Fontaine   wassim.fontaine@outlook.fr 06 45 16 25 00
-## 24 C024     MBAYE            awa.mbaye@free.fr 06 68 66 82 64
-## 25 C025   LAMBERT    valerie.lambert@gmail.com 06 37 15 35 13
-## 26 C026    ndiaye           zoe.ndiaye@outlook 06 86 35 59 98
-## 27 C027      Kone      yasmine.kone@outlook.fr 06 95 98 62 00
-## 28 C028     BLANC        ulysse.blanc@@free.fr 06 83 42 80 89
-## 29 C029    Durand       aminata.durand@free.fr 07 83 60 61 89
-## 30 C030        LE        nora.legoff@orange.fr 04 78 18 55 51
-## 31 C031    garcia           zoe.garcia@free.fr 04 20 59 96 71
-## 32 C032     Blanc       elise.blanc@lecnam.net 01 80 29 26 45
-## 33 C033        Ba              omar.ba@free.fr           &lt;NA&gt;
-## 34 C034     ROBIN      rokhaya.robin@orange.fr 07 42 41 32 30
-## 35 C035        Ba          djibril.ba@yahoo.fr 06 18 90 92 39
-## 36 C036    haddad       nora.haddad@outlook.fr 04 34 45 51 82
-## 37 C037    Haddad    pauline.haddad@lecnam.net 04 85 92 03 37
-## 38 C038      wang         chen.wang@lecnam.net 01 74 08 10 19
-## 39 C039   Bernard        gael.bernard@yahoo.fr 01 21 24 00 85
-## 40 C040   Bernard    valerie.bernard@orange.fr 06 79 64 75 33
-## 41 C041   mercier            awa.mercier@gmail 07 37 03 72 16
-## 42 C042    Diallo   baptiste.diallo@lecnam.net 06 66 89 21 17
-## 43 C043     MBAYE          fatou.mbaye@free.fr 06 43 08 34 25
-## 44 C044    DURAND          chen.durand@free.fr           &lt;NA&gt;
-## 45 C045   lefèvre   quentin.lefevre@outlook.fr 07 19 17 22 70
-## 46 C046    Diallo    aminata.diallo@lecnam.net 01 92 56 57 65
-## 47 C047      KONE                              04 61 40 18 02
-## 48 C048 Chevalier  aminata.chevalier@orange.fr 06 43 51 05 19
-## 49 C049    Girard      djibril.girard@yahoo.fr 01 80 35 78 56
-## 50 C050   Le Goff           lea.legoff@free.fr 07 32 68 82 35
-## 51 C051      Diop           theo.diop@yahoo.fr 06 85 38 61 66
-## 52 C052      Fall           dina.fall@yahoo.fr 01 74 21 68 91
-## 53 C053     Mbaye        djibril.mbaye@free.fr 01 35 20 13 64
-## 54 C054   lefèvre         awa.lefevre@yahoo.fr 04 66 65 52 26
-## 55 C055    DIALLO       chen.diallo@lecnam.net 07 51 92 24 67
-## 56 C056       Sow       rokhaya.sow@outlook.fr 04 43 01 84 88
-## 57 C057      ROUX      clemence.roux@gmail.com 06 30 59 56 06
-## 58 C058 Chevalier pauline.chevalier@outlook.fr 06 96 58 78 93
-## 59 C059 Chevalier     ines.chevalier@gmail.com 06 49 62 43 85
-## 60 C060    DUPONT       wassim.dupont@yahoo.fr 07 80 31 99 53
-##                                            adresse inscription
-## 1                       1 bd Gambetta, 75020 PARIS  24/08/2023
-## 2                  38 impasse Pasteur, 59000 Lille  20/02/2025
-## 3             66 boulevard de la Paix, 75011 Paris  20/08/2025
-## 4                46 avenue de la Paix, 75011 PARIS  02/09/2024
-## 5     9 boulevard de la République, 31000 TOULOUSE  22/07/2025
-## 6         79 avenue de la République, 44000 Nantes  20/02/2025
-## 7                  85 rue Gambetta, 31000 TOULOUSE  02/09/2025
-## 8              75 bd de la Paix, 34000 MONTPELLIER  2025-09-05
-## 9           37 impasse Gambetta, 93200 Saint-Denis  2025-03-02
-## 10        29 Rue de la République, 13005 Marseille  14/07/2023
-## 11                     56 Rue Pasteur, 75011 PARIS  2025-02-07
-## 12              45 rue de la Paix, 13005 Marseille  25/10/2024
-## 13                   62 Av. Gambetta, 35000 RENNES  2024-09-17
-## 14         31 impasse de la Paix, 67000 Strasbourg  19/07/2024
-## 15             68 Rue Saint-Martin, 33800 Bordeaux  20/01/2023
-## 16        98 impasse de la République, 75020 Paris  2024-03-27
-## 17            89 rue Victor Hugo, 67000 Strasbourg  14/08/2025
-## 18     71 boulevard Victor Hugo, 34000 Montpellier  2023-11-29
-## 19                94 Av. des Lilas, 33800 BORDEAUX  2024-09-14
-## 20             11 place Gambetta, 67000 Strasbourg  2024-05-13
-## 21        64 rue de la République, 13005 Marseille  02/09/2025
-## 22           72 rue de la République, 35000 Rennes    19-05-24
-## 23             76 bd de la République, 75011 PARIS  17/04/2025
-## 24              83 boulevard des Lilas, 06000 Nice    23-12-24
-## 25               40 Av. Saint-Martin, 44000 Nantes  15/08/2024
-## 26           61 avenue Jean Jaurès, 31000 Toulouse  2024-04-22
-## 27            59 boulevard Victor Hugo, 06000 NICE  05/05/2023
-## 28                 45 rue Saint-Martin, 69007 LYON  05/09/2025
-## 29             44 place Saint-Martin, 35000 Rennes  06/07/2025
-## 30               44 avenue Jean Jaurès, 69007 LYON  18/06/2023
-## 31              2 boulevard de la Paix, 69007 LYON    15-03-24
-## 32     99 place du Général de Gaulle, 35000 Rennes  20/05/2023
-## 33              57 boulevard des Lilas, 69007 Lyon  05/06/2024
-## 34             113 Av. Gambetta, 93200 SAINT-DENIS  11/03/2025
-## 35         111 impasse Victor Hugo, 31000 Toulouse  15/05/2025
-## 36               44 avenue Jean Jaurès, 06000 NICE  03/01/2024
-## 37              1 avenue Jean Jaurès, 35000 RENNES    12-01-23
-## 38                 34 rue Gambetta, 33800 Bordeaux  04/07/2025
-## 39               101 Rue des Lilas, 31000 TOULOUSE  12/11/2023
-## 40         81 avenue de la Paix, 93200 Saint-Denis    11-04-25
-## 41                   6 rue de la Paix, 59000 Lille  11/01/2025
-## 42        106 rue du Général de Gaulle, 69007 LYON  2025-02-28
-## 43         82 avenue de la République, 75020 PARIS    22-06-24
-## 44    114 boulevard de la République, 35000 Rennes  2023-12-05
-## 45                 31 avenue Gambetta, 75020 PARIS  16/06/2023
-## 46             114 Av. Jean Jaurès, 31000 Toulouse  2025-08-09
-## 47               57 Av. Saint-Martin, 35000 Rennes  2025-05-31
-## 48  9 boulevard de la République, 67000 STRASBOURG  28/11/2023
-## 49             94 avenue Victor Hugo, 44000 Nantes  20/06/2024
-## 50            27 boulevard des Lilas, 44000 NANTES    25-03-25
-## 51   29 impasse de la République, 67000 STRASBOURG  06/12/2023
-## 52                  41 Rue des Lilas, 44000 Nantes  18/12/2023
-## 53            103 Rue Saint-Martin, 31000 Toulouse  08/05/2024
-## 54        117 boulevard de la Paix, 31000 Toulouse  26/12/2023
-## 55                     53 rue Gambetta, 06000 Nice  28/04/2024
-## 56               60 Av. des Lilas, 13005 MARSEILLE  01/08/2024
-## 57         14 avenue Saint-Martin, 13005 Marseille  12/08/2023
-## 58            80 Rue de la République, 75011 Paris  07/08/2023
-## 59              92 Av. des Lilas, 67000 Strasbourg    31-12-24
-## 60 89 impasse du Général de Gaulle, 33800 BORDEAUX    18-04-24
-##           nom_complet    prenom
-## 1      valérie   fall   valérie
-## 2         JADE GIRARD      JADE
-## 3      Chen Chevalier      Chen
-## 4        awa   ndiaye       awa
-## 5          Gaël Mbaye      Gaël
-## 6      Rokhaya Benali   Rokhaya
-## 7            Awa Faye       Awa
-## 8     Clémence Garcia  Clémence
-## 9         Jade Martin      Jade
-## 10       Wang, Moussa    Moussa
-## 11     DIALLO Quentin   Quentin
-## 12    Benali, Rokhaya   Rokhaya
-## 13        sami   diop      sami
-## 14     Djibril Girard   Djibril
-## 15        DURAND Dina      Dina
-## 16       Benali, Gaël      Gaël
-## 17      CLÉMENCE FALL  CLÉMENCE
-## 18      théo   girard      théo
-## 19   wassim   le goff    wassim
-## 20     Pauline Girard   Pauline
-## 21       PAULINE FALL   PAULINE
-## 22       ELIAS NGUYEN     ELIAS
-## 23    Wassim Fontaine    Wassim
-## 24          AWA MBAYE       AWA
-## 25    LAMBERT Valérie   Valérie
-## 26       zoé   ndiaye       zoé
-## 27       Yasmine Kone   Yasmine
-## 28       ULYSSE BLANC    ULYSSE
-## 29    Durand, Aminata   Aminata
-## 30       LE GOFF Nora GOFF Nora
-## 31       zoé   garcia       zoé
-## 32        Élise Blanc     Élise
-## 33            Omar Ba      Omar
-## 34      ROBIN Rokhaya   Rokhaya
-## 35         Djibril Ba   Djibril
-## 36      nora   haddad      nora
-## 37     Pauline Haddad   Pauline
-## 38        chen   wang      chen
-## 39       Gaël Bernard      Gaël
-## 40    Valérie Bernard   Valérie
-## 41      awa   mercier       awa
-## 42    Baptiste Diallo  Baptiste
-## 43        MBAYE Fatou     Fatou
-## 44        DURAND Chen      Chen
-## 45  quentin   lefèvre   quentin
-## 46     Aminata Diallo   Aminata
-## 47          KONE Nora      Nora
-## 48 Chevalier, Aminata   Aminata
-## 49     Djibril Girard   Djibril
-## 50        Léa Le Goff       Léa
-## 51         Diop, Théo      Théo
-## 52         Fall, Dina      Dina
-## 53      Djibril Mbaye   Djibril
-## 54      awa   lefèvre       awa
-## 55        DIALLO Chen      Chen
-## 56        Rokhaya Sow   Rokhaya
-## 57      CLÉMENCE ROUX  CLÉMENCE
-## 58 Chevalier, Pauline   Pauline
-## 59    Chevalier, Inès      Inès
-## 60      DUPONT Wassim    Wassim</code></pre>
+head(contacts_bruts, 10)</code></pre>
+<pre><code>##      id       nom                     email      telephone
+## 1  C001      fall     valerie.fall@yahoo.fr           &lt;NA&gt;
+## 2  C002    GIRARD       jade.girard@free.fr 04 50 22 51 38
+## 3  C003 Chevalier  chen.chevalier@orange.fr 01 02 23 14 73
+## 4  C004    ndiaye     awa.ndiaye@lecnam.net 01 98 84 59 09
+## 5  C005     Mbaye     gael.mbaye@lecnam.net 04 57 05 26 77
+## 6  C006    Benali   rokhaya.benali@yahoo.fr 06 40 95 18 29
+## 7  C007      Faye         awa.faye@yahoo.fr 07 24 33 72 04
+## 8  C008    Garcia clemence.garcia@orange.fr 01 72 83 18 14
+## 9  C009    Martin    jade.martin@lecnam.net 06 08 50 10 27
+## 10 C010      Wang       moussa.wangyahoo.fr 07 73 32 60 45
+##                                         adresse inscription     nom_complet
+## 1                    1 bd Gambetta, 75020 PARIS  24/08/2023  valérie   fall
+## 2               38 impasse Pasteur, 59000 Lille  20/02/2025     JADE GIRARD
+## 3          66 boulevard de la Paix, 75011 Paris  20/08/2025  Chen Chevalier
+## 4             46 avenue de la Paix, 75011 PARIS  02/09/2024    awa   ndiaye
+## 5  9 boulevard de la République, 31000 TOULOUSE  22/07/2025      Gaël Mbaye
+## 6      79 avenue de la République, 44000 Nantes  20/02/2025  Rokhaya Benali
+## 7               85 rue Gambetta, 31000 TOULOUSE  02/09/2025        Awa Faye
+## 8           75 bd de la Paix, 34000 MONTPELLIER  2025-09-05 Clémence Garcia
+## 9        37 impasse Gambetta, 93200 Saint-Denis  2025-03-02     Jade Martin
+## 10     29 Rue de la République, 13005 Marseille  14/07/2023    Wang, Moussa
+##      prenom
+## 1   valérie
+## 2      JADE
+## 3      Chen
+## 4       awa
+## 5      Gaël
+## 6   Rokhaya
+## 7       Awa
+## 8  Clémence
+## 9      Jade
+## 10   Moussa</code></pre>
 <p>.b</p>
 <pre class="r"><code>num_valide = sum(!is.na(contacts_bruts$telephone))
 num_s06_07 = sum(str_detect(contacts_bruts$telephone, &quot;^(06|07)&quot;), na.rm = TRUE)</code></pre>
@@ -1186,8 +1044,8 @@ contacts_bruts2 |&gt;
       str_detect(inscription, &quot;^\\d{2}-\\d{2}-\\d{2}$&quot;) ~ dmy(inscription)
     ))
   )
-contacts_bruts3</code></pre>
-<pre><code>## # A tibble: 60 × 11
+head(contacts_bruts3, 10)</code></pre>
+<pre><code>## # A tibble: 10 × 11
 ##    id    nom    email telephone rue   cp    ville inscription nom_complet prenom
 ##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;date&gt;      &lt;chr&gt;       &lt;chr&gt; 
 ##  1 C001  fall   vale… &lt;NA&gt;      1 bd… 75020 Paris 2023-08-24  valérie   … valér…
@@ -1200,7 +1058,6 @@ contacts_bruts3</code></pre>
 ##  8 C008  Garcia clem… 01 72 83… 75 b… 34000 Mont… 2025-09-05  Clémence G… Cléme…
 ##  9 C009  Martin jade… 06 08 50… 37 i… 93200 Sain… 2025-03-02  Jade Martin Jade  
 ## 10 C010  Wang   mous… 07 73 32… 29 R… 13005 Mars… 2023-07-14  Wang, Mous… Moussa
-## # ℹ 50 more rows
 ## # ℹ 1 more variable: departement &lt;chr&gt;</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Tableau des inscriptions par année :</li>
@@ -1235,6 +1092,225 @@ write_csv(contacts_propres, &quot;sorties/contacts_propres.csv&quot;)
 
 n_complets &lt;- sum(complete.cases(contacts_propres))</code></pre>
 <p>Il y a 57 contacts complets sur 60.</p>
+</div>
+</div>
+<div id="partie-c" class="section level1">
+<h1>Partie C</h1>
+<div id="c1" class="section level2">
+<h2>C1</h2>
+<pre class="r"><code>lignes &lt;- read_lines(&quot;data/journal_serveur.log&quot;)
+n_lignes &lt;- length(lignes)
+n_niveaux &lt;- c(
+  INFO = sum(str_detect(lignes, &quot;\\[INFO\\]&quot;)),
+  WARN = sum(str_detect(lignes, &quot;\\[WARN\\]&quot;)),
+  ERROR = sum(str_detect(lignes, &quot;\\[ERROR\\]&quot;))
+)
+n_niveaux</code></pre>
+<pre><code>##  INFO  WARN ERROR 
+##   317    45    38</code></pre>
+<p>Le journal contient 400 lignes : 317 INFO, 45 WARN et 38 ERROR.</p>
+</div>
+<div id="c2" class="section level2">
+<h2>C2</h2>
+<pre class="r"><code>log &lt;- tibble(ligne = lignes) |&gt;
+  mutate(
+    horodatage = ymd_hms(str_sub(ligne, 1, 19)),
+    niveau = str_match(ligne, &quot;\\[([A-Z]+)\\]&quot;)[, 2],
+    user = na_if(str_match(ligne, &quot;user=(\\S+)&quot;)[, 2], &quot;-&quot;),
+    ip = str_match(ligne, &quot;ip=(\\S+)&quot;)[, 2],
+    action = str_match(ligne, &quot;action=(\\S+)&quot;)[, 2],
+    fichier = str_match(ligne, &quot;fichier=(\\S+)&quot;)[, 2],
+    code = as.integer(str_match(ligne, &quot;code=(\\d+)&quot;)[, 2]),
+    duree = as.numeric(str_match(ligne, &quot;duree=(\\d+(?:\\.\\d+)?)ms&quot;)[, 2]),
+    msg = str_match(ligne, &#39;msg=&quot;([^&quot;]*)&quot;&#39;)[, 2]
+  ) |&gt;
+  select(-ligne)
+
+log</code></pre>
+<pre><code>## # A tibble: 400 × 9
+##    horodatage          niveau user  ip          action fichier  code duree msg  
+##    &lt;dttm&gt;              &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;
+##  1 2026-01-15 00:19:03 WARN   elias 192.168.1.… view   &lt;NA&gt;      401   159 &lt;NA&gt; 
+##  2 2026-01-15 00:23:49 WARN   jade  192.168.1.… downl… notes.…   404   221 &lt;NA&gt; 
+##  3 2026-01-15 00:34:14 ERROR  theo  192.168.1.… downl… photo.…   404  2720 Mémo…
+##  4 2026-01-15 00:39:04 INFO   awa   203.0.113.… search &lt;NA&gt;      200   218 &lt;NA&gt; 
+##  5 2026-01-15 00:42:08 INFO   awa   192.168.1.… search &lt;NA&gt;      200   167 &lt;NA&gt; 
+##  6 2026-01-15 01:10:44 INFO   gael  192.168.1.… upload photo.…   200   534 &lt;NA&gt; 
+##  7 2026-01-15 01:11:08 WARN   theo  192.168.2.… view   &lt;NA&gt;      429   608 &lt;NA&gt; 
+##  8 2026-01-15 01:12:23 INFO   theo  192.168.1.… view   &lt;NA&gt;      200   129 &lt;NA&gt; 
+##  9 2026-01-15 01:20:15 ERROR  jade  192.168.1.… login  &lt;NA&gt;      500   555 Time…
+## 10 2026-01-15 01:41:09 INFO   &lt;NA&gt;  192.168.1.… view   &lt;NA&gt;      200   206 &lt;NA&gt; 
+## # ℹ 390 more rows</code></pre>
+</div>
+<div id="c3" class="section level2">
+<h2>C3</h2>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>log |&gt;
+  count(jour = as_date(horodatage), niveau) |&gt;
+  pivot_wider(names_from = niveau, values_from = n, values_fill = 0)</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   jour       ERROR  INFO  WARN
+##   &lt;date&gt;     &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1 2026-01-15    15   101    17
+## 2 2026-01-16    12    96    13
+## 3 2026-01-17    11   120    15</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>heures = log |&gt; 
+  group_by(
+    heure = hour(horodatage)
+  ) |&gt; 
+  summarise(
+    n_requete = n()
+  ) |&gt; 
+  arrange(
+    desc(n_requete)
+  )
+head(heures, 5)</code></pre>
+<pre><code>## # A tibble: 5 × 2
+##   heure n_requete
+##   &lt;int&gt;     &lt;int&gt;
+## 1    14        29
+## 2    10        25
+## 3    19        25
+## 4     4        23
+## 5     1        20</code></pre>
+<p>Le serveur est le plus sollicité à 14 h, avec 29 requêtes sur les
+trois jours.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>erreurs_user &lt;- log |&gt;
+  filter(niveau == &quot;ERROR&quot;, !is.na(user)) |&gt;
+  count(user, sort = TRUE)
+head(erreurs_user, 5)</code></pre>
+<pre><code>## # A tibble: 5 × 2
+##   user         n
+##   &lt;chr&gt;    &lt;int&gt;
+## 1 jade         5
+## 2 rokhaya      4
+## 3 valerie      4
+## 4 awa          3
+## 5 clemence     3</code></pre>
+<pre class="r"><code>part_anonyme &lt;- mean(is.na(log$user))</code></pre>
+<p>Les utilisateurs qui ont le plus d’erreurs sont jade (5), rokhaya
+(4), valerie (4). Les requêtes anonymes représentent 4.2 % du total.</p>
+</div>
+<div id="c4" class="section level2">
+<h2>C4</h2>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>log |&gt;
+  group_by(action) |&gt;
+  summarise(
+    mediane = median(duree, na.rm = TRUE),
+    centile_90 = quantile(duree, 0.9, na.rm = TRUE)
+  )</code></pre>
+<pre><code>## # A tibble: 6 × 3
+##   action   mediane centile_90
+##   &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1 download    199        796 
+## 2 login       222        533.
+## 3 logout      207        614 
+## 4 search      194        514.
+## 5 upload      257        536 
+## 6 view        180.       622.</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>mediane_niveau &lt;- log |&gt;
+  group_by(niveau) |&gt;
+  summarise(mediane = median(duree, na.rm = TRUE))
+mediane_niveau</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   niveau mediane
+##   &lt;chr&gt;    &lt;dbl&gt;
+## 1 ERROR      785
+## 2 INFO       176
+## 3 WARN       196</code></pre>
+<p>Oui, les requêtes erreurs sont les plus lentes avec une mediane de
+785. Soit 4.22 plus lent.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Tableau des types de messages d’erreur :</li>
+</ol>
+<pre class="r"><code>messages &lt;- log |&gt;
+  filter(niveau == &quot;ERROR&quot;, !is.na(msg)) |&gt;
+  count(msg, sort = TRUE)
+messages</code></pre>
+<pre><code>## # A tibble: 4 × 2
+##   msg                         n
+##   &lt;chr&gt;                   &lt;int&gt;
+## 1 Timeout base de données    12
+## 2 Connexion refusée          10
+## 3 Mémoire insuffisante        9
+## 4 Fichier introuvable         7</code></pre>
+<p>Les messages d’erreur sont : Timeout base de données (12) ; Connexion
+refusée (10) ; Mémoire insuffisante (9) ; Fichier introuvable (7).</p>
+<ol start="4" style="list-style-type: lower-alpha">
+<li>Classement des extensions de fichier les plus télécharger.</li>
+</ol>
+<pre class="r"><code>top_telechargement &lt;- log |&gt; 
+  filter(action == &quot;download&quot;,
+         code == &quot;200&quot;,
+         !is.na(fichier)) |&gt; 
+  group_by(
+    extension = str_match(fichier, &quot;\\.([a-zA-Z]{2,5})$&quot;)[, 2],
+    fichier) |&gt;
+  summarise(
+    n_telechargement = n(),
+    .groups = &quot;drop_last&quot;
+  ) |&gt; 
+  arrange(
+    desc(n_telechargement)
+  )
+top_telechargement</code></pre>
+<pre><code>## # A tibble: 6 × 3
+## # Groups:   extension [6]
+##   extension fichier          n_telechargement
+##   &lt;chr&gt;     &lt;chr&gt;                       &lt;int&gt;
+## 1 png       photo.png                      14
+## 2 csv       data.csv                       12
+## 3 html      cours_R.html                   10
+## 4 pdf       rapport_2025.pdf                8
+## 5 xlsx      notes.xlsx                      7
+## 6 zip       archive.zip                     7</code></pre>
+</div>
+<div id="c5" class="section level2">
+<h2>C5</h2>
+<pre class="r"><code># a
+externes &lt;- log |&gt; filter(!str_detect(ip, &quot;^192\\.168\\.&quot;))
+n_externes &lt;- nrow(externes)
+n_ip_externes &lt;- n_distinct(externes$ip)</code></pre>
+<p>25 requêtes viennent de l’extérieur du réseau interne, depuis 2
+adresses distinctes.</p>
+<pre class="r"><code># b
+ip_externes &lt;- externes |&gt;
+  group_by(ip) |&gt;
+  summarise(
+    requetes = n(),
+    utilisateurs = n_distinct(user, na.rm = TRUE),
+    erreurs = sum(niveau == &quot;ERROR&quot;),
+    refus = sum(code %in% c(401, 429))
+  ) |&gt;
+  arrange(desc(refus), desc(erreurs))
+ip_externes</code></pre>
+<pre><code>## # A tibble: 2 × 5
+##   ip           requetes utilisateurs erreurs refus
+##   &lt;chr&gt;           &lt;int&gt;        &lt;int&gt;   &lt;int&gt; &lt;int&gt;
+## 1 203.0.113.42        5            5       0     0
+## 2 203.0.113.7        20           10       0     0</code></pre>
+<pre class="r"><code>suspecte &lt;- ip_externes[1, ]</code></pre>
+<p>L’adresse la plus suspecte est 203.0.113.42 : elle a envoyé 5
+requêtes avec 5 utilisateurs différents, et elle cumule 0 erreurs et 0
+refus (401 ou 429), ce qui ressemble à des tentatives répétées d’accès
+non autorisé.</p>
+<pre class="r"><code># c
+all(str_detect(log$ip, &quot;^(\\d{1,3}\\.){3}\\d{1,3}$&quot;))</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 </div>
 </div>
 
