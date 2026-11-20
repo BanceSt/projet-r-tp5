@@ -177,7 +177,7 @@ contacts_bruts = contacts_bruts |>
       TRUE ~ word(nom_complet, 1)
     )
   )
-contacts_bruts
+head(contacts_bruts, 10)
 ```
 b.
 
@@ -497,9 +497,8 @@ top_telechargement
 ```
 
 ## C5
-
+a.
 ```{r}
-# a
 externes <- log |> filter(!str_detect(ip, "^192\\.168\\."))
 n_externes <- nrow(externes)
 n_ip_externes <- n_distinct(externes$ip)
@@ -507,8 +506,8 @@ n_ip_externes <- n_distinct(externes$ip)
 
 `r n_externes` requêtes viennent de l'extérieur du réseau interne, depuis `r n_ip_externes` adresses distinctes.
 
+b.
 ```{r}
-# b
 ip_externes <- externes |>
   group_by(ip) |>
   summarise(
@@ -525,7 +524,174 @@ suspecte <- ip_externes[1, ]
 
 L'adresse la plus suspecte est `r suspecte$ip` : elle a envoyé `r suspecte$requetes` requêtes avec `r suspecte$utilisateurs` utilisateurs différents, et elle cumule `r suspecte$erreurs` erreurs et `r suspecte$refus` refus (401 ou 429), ce qui ressemble à des tentatives répétées d'accès non autorisé.
 
+c.
 ```{r}
-# c
 all(str_detect(log$ip, "^(\\d{1,3}\\.){3}\\d{1,3}$"))
 ```
+
+
+# Partie D
+
+## D1
+
+a.
+```{r}
+avis <- read_csv("data/avis_clients.csv") |>
+  mutate(id_avis = row_number(), longueur = str_length(texte))
+
+avis_long <- avis[which.max(avis$longueur), ]
+```
+
+La longueur moyenne d'un avis est de `r round(mean(avis$longueur), 1)` caractères. L'avis le plus long (`r avis_long$longueur` caractères) est : « `r avis_long$texte` ».
+
+b.
+```{r}
+avis <- avis |>
+  mutate(majuscules = texte == str_to_upper(texte) & str_detect(texte, "[[:alpha:]]"))
+
+avis |>
+  group_by(majuscules) |>
+  summarise(qtn = n(), note_moyenne = mean(note))
+```
+
+`r sum(avis$majuscules)` avis sont entièrement en majuscules. Leur note moyenne est de `r round(mean(avis$note[avis$majuscules]), 2)` contre `r round(mean(avis$note[!avis$majuscules]), 2)` pour les autres.
+
+c.
+```{r}
+n_exclamation <- sum(str_detect(avis$texte, "!"))
+n_emoticone <- sum(str_detect(avis$texte, ":[()]"))
+```
+
+`r n_exclamation` avis contiennent au moins un point d'exclamation et `r n_emoticone` contiennent un émoticône.
+
+
+
+## D2
+a.
+```{r}
+mots <- avis |>
+  mutate(mot = str_split(str_to_lower(texte), "[^\\p{L}'’]+")) |>
+  unnest(mot) |>
+  filter(mot != "") |>
+  select(id_avis, produit, note, mot)
+
+mots
+```
+
+b.
+```{r}
+n_mots <- nrow(mots)
+n_distincts <- n_distinct(mots$mot)
+```
+
+Il y a `r n_mots` mots au total et `r n_distincts` mots distincts.
+
+c.
+```{r}
+top10 <- mots |> count(mot, sort = TRUE) |> head(10)
+top10
+```
+```{r}
+mots_vides <- c("de", "du", "des", "la", "le", "les", "et", "un", "une", "pour", "ce",
+                "que", "au", "à", "je", "ne", "pas", "c'est", "est", "s'est", "dès", "en")
+
+mots_utiles <- mots |> filter(!mot %in% mots_vides)
+top10_utiles <- mots_utiles |> count(mot, sort = TRUE) |> head(10)
+top10_utiles
+```
+
+Les 10 mots les plus fréquents sont : `r paste(top10$mot, collapse = ", ")`. Sans les mots vides, ce sont : `r paste(top10_utiles$mot, collapse = ", ")`.
+
+
+## D3
+
+a.
+```{r}
+mots_utiles <- mots_utiles |>
+  mutate(categorie = case_when(note <= 2 ~ "négatif", note == 3 ~ "neutre", TRUE ~ "positif"))
+
+top5_categories <- mots_utiles |>
+  count(categorie, mot, sort = TRUE) |>
+  group_by(categorie) |>
+  slice_max(n, n = 5, with_ties = FALSE) |>
+  ungroup()
+top5_categories
+
+liste_top5 <- top5_categories |>
+  group_by(categorie) |>
+  summarise(mots = paste(mot, collapse = ", ")) |>
+  deframe()
+```
+
+Les 5 mots les plus fréquents sont : pour les avis négatifs, `r liste_top5["négatif"]` ; pour les avis neutres, `r liste_top5["neutre"]` ; pour les avis positifs, `r liste_top5["positif"]`.
+
+b.
+```{r}
+notes_mots <- mots_utiles |>
+  distinct(id_avis, mot, note) |>
+  group_by(mot) |>
+  summarise(qtn = n(), note_moyenne = mean(note)) |>
+  filter(qtn >= 10)
+
+meilleurs <- notes_mots |> slice_max(note_moyenne, n = 5, with_ties = FALSE)
+pires <- notes_mots |> slice_min(note_moyenne, n = 5, with_ties = FALSE)
+meilleurs
+pires
+```
+
+Les mots associés aux meilleures notes sont `r paste(meilleurs$mot, collapse = ", ")` et ceux associés aux pires notes sont `r paste(pires$mot, collapse = ", ")`.
+
+
+## D4
+
+```{r}
+lex_positif <- c("satisfait", "excellent", "rapide", "confortable", "recommande", "parfait",
+"solide", "léger", "super", "bonne", "conforme", "correct")
+lex_negatif <- c("déçu", "petite", "retard", "cassé", "étanche", "injoignable", "cher",
+"fragile", "mauvaise", "lourd")
+```
+
+
+a.
+```{r}
+mots_sentiment <- avis |>
+  mutate(
+    texte = str_replace_all(str_to_lower(texte), "ne recommande pas", "déconseille"),
+    mot = str_split(texte, "[^\\p{L}'’]+")
+  ) |>
+  unnest(mot) |>
+  filter(mot != "")
+
+scores <- mots_sentiment |>
+  group_by(id_avis) |>
+  summarise(positifs = sum(mot %in% lex_positif), negatifs = sum(mot %in% lex_negatif))
+
+avis_score <- avis |>
+  left_join(scores, by = "id_avis") |>
+  mutate(score = positifs - negatifs)
+
+avis_score |> select(id_avis, note, positifs, negatifs, score) |> head(10)
+```
+
+
+b.
+```{r}
+correlation <- cor(avis_score$score, avis_score$note, use = "complete.obs")
+correlation
+```
+
+La corrélation entre le score et la note est de `r round(correlation, 2)` : le score est `r if (correlation > 0.6) "un bon" else "un assez mauvais"` indicateur de la note.
+
+
+c.
+```{r}
+contradictoires <- avis_score |>
+  filter((score > 0 & note <= 2) | (score < 0 & note >= 4))
+
+triste <- avis_score |>
+  filter(str_detect(texte, ":\\(")) |>
+  select(id_avis, note, score, texte)
+triste
+```
+
+`r nrow(contradictoires)` avis se contredisent. Les `r nrow(triste)` avis avec un émoticône « :( » ont une note moyenne de `r round(mean(triste$note), 2)` et un score moyen de `r round(mean(triste$score), 2)` : le score ne tient pas compte de l'émoticône, qui exprime pourtant la déception.

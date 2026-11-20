@@ -380,6 +380,13 @@ display: none;
 <li><a href="#c4" id="toc-c4">C4</a></li>
 <li><a href="#c5" id="toc-c5">C5</a></li>
 </ul></li>
+<li><a href="#partie-d" id="toc-partie-d">Partie D</a>
+<ul>
+<li><a href="#d1" id="toc-d1">D1</a></li>
+<li><a href="#d2" id="toc-d2">D2</a></li>
+<li><a href="#d3" id="toc-d3">D3</a></li>
+<li><a href="#d4" id="toc-d4">D4</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -579,190 +586,40 @@ contacts_bruts = contacts_bruts |&gt;
       TRUE ~ word(nom_complet, 1)
     )
   )
-contacts_bruts</code></pre>
-<pre><code>##      id       nom                        email         telephone
-## 1  C001      fall        valerie.fall@yahoo.fr                  
-## 2  C002    GIRARD          jade.girard@free.fr    04 50 22 51 38
-## 3  C003 Chevalier     chen.chevalier@orange.fr    01 02 23 14 73
-## 4  C004    ndiaye        awa.ndiaye@lecnam.net    01 98 84 59 09
-## 5  C005     Mbaye        gael.mbaye@lecnam.net        0457052677
-## 6  C006    Benali      rokhaya.benali@yahoo.fr    06 40 95 18 29
-## 7  C007      Faye            awa.faye@yahoo.fr        0724337204
-## 8  C008    Garcia    clemence.garcia@orange.fr    01.72.83.18.14
-## 9  C009    Martin       jade.martin@lecnam.net    06-08-50-10-27
-## 10 C010      Wang          moussa.wangyahoo.fr    07 73 32 60 45
-## 11 C011    DIALLO      quentin.diallo@yahoo.fr        0112118638
-## 12 C012    Benali     rokhaya.benali@gmail.com        0669201756
-## 13 C013      diop           sami.diop@yahoo.fr    06 52 63 68 30
-## 14 C014    Girard       djibril.girard@free.fr    04 69 18 79 54
-## 15 C015    DURAND         dina.durand@yahoo.fr +33 6 59 38 97 79
-## 16 C016    Benali         GAEL.BENALI@YAHOO.FR   +33(0)606357730
-## 17 C017      FALL     clemence.fall@outlook.fr    06 85 48 12 30
-## 18 C018    girard          THEO.GIRARD@FREE.FR    06.96.51.76.39
-## 19 C019   le goff     wassim.legoff@outlook.fr        0605942424
-## 20 C020    Girard     pauline.girard@orange.fr    06 87 48 27 91
-## 21 C021      FALL       PAULINE.FALLOUTLOOK.FR        0662741559
-## 22 C022    NGUYEN        elias.nguyen@yahoo.fr        0755004142
-## 23 C023  Fontaine   wassim.fontaine@outlook.fr    06 45 16 25 00
-## 24 C024     MBAYE            awa.mbaye@free.fr    06 68 66 82 64
-## 25 C025   LAMBERT    valerie.lambert@gmail.com    06.37.15.35.13
-## 26 C026    ndiaye           zoe.ndiaye@outlook        0686355998
-## 27 C027      Kone      YASMINE.KONE@OUTLOOK.FR   +33(0)695986200
-## 28 C028     BLANC        ulysse.blanc@@free.fr    06 83 42 80 89
-## 29 C029    Durand       aminata.durand@free.fr    07 83 60 61 89
-## 30 C030        LE        nora.legoff@orange.fr    04 78 18 55 51
-## 31 C031    garcia           zoe.garcia@free.fr    04.20.59.96.71
-## 32 C032     Blanc       elise.blanc@lecnam.net   +33(0)180292645
-## 33 C033        Ba              omar.ba@free.fr           inconnu
-## 34 C034     ROBIN      rokhaya.robin@orange.fr   +33(0)742413230
-## 35 C035        Ba          djibril.ba@yahoo.fr        0618909239
-## 36 C036    haddad       nora.haddad@outlook.fr    04 34 45 51 82
-## 37 C037    Haddad    pauline.haddad@lecnam.net    04 85 92 03 37
-## 38 C038      wang         chen.wang@lecnam.net        0174081019
-## 39 C039   Bernard        gael.bernard@yahoo.fr    01 21 24 00 85
-## 40 C040   Bernard    valerie.bernard@orange.fr        0679647533
-## 41 C041   mercier            awa.mercier@gmail    07 37 03 72 16
-## 42 C042    Diallo   baptiste.diallo@lecnam.net   +33(0)666892117
-## 43 C043     MBAYE          FATOU.MBAYE@FREE.FR        0643083425
-## 44 C044    DURAND          chen.durand@free.fr          06 12 34
-## 45 C045   lefèvre   quentin.lefevre@outlook.fr +33 7 19 17 22 70
-## 46 C046    Diallo    aminata.diallo@lecnam.net   +33(0)192565765
-## 47 C047      KONE                                +33(0)461401802
-## 48 C048 Chevalier  aminata.chevalier@orange.fr    06 43 51 05 19
-## 49 C049    Girard      djibril.girard@yahoo.fr        0180357856
-## 50 C050   Le Goff           lea.legoff@free.fr    07 32 68 82 35
-## 51 C051      Diop           theo.diop@yahoo.fr        0685386166
-## 52 C052      Fall           dina.fall@yahoo.fr    01 74 21 68 91
-## 53 C053     Mbaye        DJIBRIL.MBAYE@FREE.FR    01-35-20-13-64
-## 54 C054   lefèvre         awa.lefevre@yahoo.fr    04 66 65 52 26
-## 55 C055    DIALLO       CHEN.DIALLO@LECNAM.NET   +33(0)751922467
-## 56 C056       Sow       rokhaya.sow@outlook.fr    04-43-01-84-88
-## 57 C057      ROUX      clemence.roux@gmail.com    06.30.59.56.06
-## 58 C058 Chevalier pauline.chevalier@outlook.fr    06 96 58 78 93
-## 59 C059 Chevalier     ines.chevalier@gmail.com        0649624385
-## 60 C060    DUPONT       wassim.dupont@yahoo.fr    07-80-31-99-53
-##                                            adresse inscription
-## 1                       1 bd Gambetta, 75020 PARIS  24/08/2023
-## 2                  38 impasse Pasteur, 59000 Lille  20/02/2025
-## 3             66 boulevard de la Paix, 75011 Paris  20/08/2025
-## 4                46 avenue de la Paix, 75011 PARIS  02/09/2024
-## 5     9 boulevard de la République, 31000 TOULOUSE  22/07/2025
-## 6         79 avenue de la République, 44000 Nantes  20/02/2025
-## 7                  85 rue Gambetta, 31000 TOULOUSE  02/09/2025
-## 8              75 bd de la Paix, 34000 MONTPELLIER  2025-09-05
-## 9           37 impasse Gambetta, 93200 Saint-Denis  2025-03-02
-## 10        29 Rue de la République, 13005 Marseille  14/07/2023
-## 11                     56 Rue Pasteur, 75011 PARIS  2025-02-07
-## 12              45 rue de la Paix, 13005 Marseille  25/10/2024
-## 13                   62 Av. Gambetta, 35000 RENNES  2024-09-17
-## 14         31 impasse de la Paix, 67000 Strasbourg  19/07/2024
-## 15             68 Rue Saint-Martin, 33800 Bordeaux  20/01/2023
-## 16        98 impasse de la République, 75020 Paris  2024-03-27
-## 17            89 rue Victor Hugo, 67000 Strasbourg  14/08/2025
-## 18     71 boulevard Victor Hugo, 34000 Montpellier  2023-11-29
-## 19                94 Av. des Lilas, 33800 BORDEAUX  2024-09-14
-## 20             11 place Gambetta, 67000 Strasbourg  2024-05-13
-## 21        64 rue de la République, 13005 Marseille  02/09/2025
-## 22           72 rue de la République, 35000 Rennes    19-05-24
-## 23             76 bd de la République, 75011 PARIS  17/04/2025
-## 24              83 boulevard des Lilas, 06000 Nice    23-12-24
-## 25               40 Av. Saint-Martin, 44000 Nantes  15/08/2024
-## 26           61 avenue Jean Jaurès, 31000 Toulouse  2024-04-22
-## 27            59 boulevard Victor Hugo, 06000 NICE  05/05/2023
-## 28                 45 rue Saint-Martin, 69007 LYON  05/09/2025
-## 29             44 place Saint-Martin, 35000 Rennes  06/07/2025
-## 30               44 avenue Jean Jaurès, 69007 LYON  18/06/2023
-## 31              2 boulevard de la Paix, 69007 LYON    15-03-24
-## 32     99 place du Général de Gaulle, 35000 Rennes  20/05/2023
-## 33              57 boulevard des Lilas, 69007 Lyon  05/06/2024
-## 34             113 Av. Gambetta, 93200 SAINT-DENIS  11/03/2025
-## 35         111 impasse Victor Hugo, 31000 Toulouse  15/05/2025
-## 36               44 avenue Jean Jaurès, 06000 NICE  03/01/2024
-## 37              1 avenue Jean Jaurès, 35000 RENNES    12-01-23
-## 38                 34 rue Gambetta, 33800 Bordeaux  04/07/2025
-## 39               101 Rue des Lilas, 31000 TOULOUSE  12/11/2023
-## 40         81 avenue de la Paix, 93200 Saint-Denis    11-04-25
-## 41                   6 rue de la Paix, 59000 Lille  11/01/2025
-## 42        106 rue du Général de Gaulle, 69007 LYON  2025-02-28
-## 43         82 avenue de la République, 75020 PARIS    22-06-24
-## 44    114 boulevard de la République, 35000 Rennes  2023-12-05
-## 45                 31 avenue Gambetta, 75020 PARIS  16/06/2023
-## 46             114 Av. Jean Jaurès, 31000 Toulouse  2025-08-09
-## 47               57 Av. Saint-Martin, 35000 Rennes  2025-05-31
-## 48  9 boulevard de la République, 67000 STRASBOURG  28/11/2023
-## 49             94 avenue Victor Hugo, 44000 Nantes  20/06/2024
-## 50            27 boulevard des Lilas, 44000 NANTES    25-03-25
-## 51   29 impasse de la République, 67000 STRASBOURG  06/12/2023
-## 52                  41 Rue des Lilas, 44000 Nantes  18/12/2023
-## 53            103 Rue Saint-Martin, 31000 Toulouse  08/05/2024
-## 54        117 boulevard de la Paix, 31000 Toulouse  26/12/2023
-## 55                     53 rue Gambetta, 06000 Nice  28/04/2024
-## 56               60 Av. des Lilas, 13005 MARSEILLE  01/08/2024
-## 57         14 avenue Saint-Martin, 13005 Marseille  12/08/2023
-## 58            80 Rue de la République, 75011 Paris  07/08/2023
-## 59              92 Av. des Lilas, 67000 Strasbourg    31-12-24
-## 60 89 impasse du Général de Gaulle, 33800 BORDEAUX    18-04-24
-##           nom_complet    prenom
-## 1      valérie   fall   valérie
-## 2         JADE GIRARD      JADE
-## 3      Chen Chevalier      Chen
-## 4        awa   ndiaye       awa
-## 5          Gaël Mbaye      Gaël
-## 6      Rokhaya Benali   Rokhaya
-## 7            Awa Faye       Awa
-## 8     Clémence Garcia  Clémence
-## 9         Jade Martin      Jade
-## 10       Wang, Moussa    Moussa
-## 11     DIALLO Quentin   Quentin
-## 12    Benali, Rokhaya   Rokhaya
-## 13        sami   diop      sami
-## 14     Djibril Girard   Djibril
-## 15        DURAND Dina      Dina
-## 16       Benali, Gaël      Gaël
-## 17      CLÉMENCE FALL  CLÉMENCE
-## 18      théo   girard      théo
-## 19   wassim   le goff    wassim
-## 20     Pauline Girard   Pauline
-## 21       PAULINE FALL   PAULINE
-## 22       ELIAS NGUYEN     ELIAS
-## 23    Wassim Fontaine    Wassim
-## 24          AWA MBAYE       AWA
-## 25    LAMBERT Valérie   Valérie
-## 26       zoé   ndiaye       zoé
-## 27       Yasmine Kone   Yasmine
-## 28       ULYSSE BLANC    ULYSSE
-## 29    Durand, Aminata   Aminata
-## 30       LE GOFF Nora GOFF Nora
-## 31       zoé   garcia       zoé
-## 32        Élise Blanc     Élise
-## 33            Omar Ba      Omar
-## 34      ROBIN Rokhaya   Rokhaya
-## 35         Djibril Ba   Djibril
-## 36      nora   haddad      nora
-## 37     Pauline Haddad   Pauline
-## 38        chen   wang      chen
-## 39       Gaël Bernard      Gaël
-## 40    Valérie Bernard   Valérie
-## 41      awa   mercier       awa
-## 42    Baptiste Diallo  Baptiste
-## 43        MBAYE Fatou     Fatou
-## 44        DURAND Chen      Chen
-## 45  quentin   lefèvre   quentin
-## 46     Aminata Diallo   Aminata
-## 47          KONE Nora      Nora
-## 48 Chevalier, Aminata   Aminata
-## 49     Djibril Girard   Djibril
-## 50        Léa Le Goff       Léa
-## 51         Diop, Théo      Théo
-## 52         Fall, Dina      Dina
-## 53      Djibril Mbaye   Djibril
-## 54      awa   lefèvre       awa
-## 55        DIALLO Chen      Chen
-## 56        Rokhaya Sow   Rokhaya
-## 57      CLÉMENCE ROUX  CLÉMENCE
-## 58 Chevalier, Pauline   Pauline
-## 59    Chevalier, Inès      Inès
-## 60      DUPONT Wassim    Wassim</code></pre>
+head(contacts_bruts, 10)</code></pre>
+<pre><code>##      id       nom                     email      telephone
+## 1  C001      fall     valerie.fall@yahoo.fr               
+## 2  C002    GIRARD       jade.girard@free.fr 04 50 22 51 38
+## 3  C003 Chevalier  chen.chevalier@orange.fr 01 02 23 14 73
+## 4  C004    ndiaye     awa.ndiaye@lecnam.net 01 98 84 59 09
+## 5  C005     Mbaye     gael.mbaye@lecnam.net     0457052677
+## 6  C006    Benali   rokhaya.benali@yahoo.fr 06 40 95 18 29
+## 7  C007      Faye         awa.faye@yahoo.fr     0724337204
+## 8  C008    Garcia clemence.garcia@orange.fr 01.72.83.18.14
+## 9  C009    Martin    jade.martin@lecnam.net 06-08-50-10-27
+## 10 C010      Wang       moussa.wangyahoo.fr 07 73 32 60 45
+##                                         adresse inscription     nom_complet
+## 1                    1 bd Gambetta, 75020 PARIS  24/08/2023  valérie   fall
+## 2               38 impasse Pasteur, 59000 Lille  20/02/2025     JADE GIRARD
+## 3          66 boulevard de la Paix, 75011 Paris  20/08/2025  Chen Chevalier
+## 4             46 avenue de la Paix, 75011 PARIS  02/09/2024    awa   ndiaye
+## 5  9 boulevard de la République, 31000 TOULOUSE  22/07/2025      Gaël Mbaye
+## 6      79 avenue de la République, 44000 Nantes  20/02/2025  Rokhaya Benali
+## 7               85 rue Gambetta, 31000 TOULOUSE  02/09/2025        Awa Faye
+## 8           75 bd de la Paix, 34000 MONTPELLIER  2025-09-05 Clémence Garcia
+## 9        37 impasse Gambetta, 93200 Saint-Denis  2025-03-02     Jade Martin
+## 10     29 Rue de la République, 13005 Marseille  14/07/2023    Wang, Moussa
+##      prenom
+## 1   valérie
+## 2      JADE
+## 3      Chen
+## 4       awa
+## 5      Gaël
+## 6   Rokhaya
+## 7       Awa
+## 8  Clémence
+## 9      Jade
+## 10   Moussa</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li></li>
 </ol>
@@ -1281,14 +1138,18 @@ top_telechargement</code></pre>
 </div>
 <div id="c5" class="section level2">
 <h2>C5</h2>
-<pre class="r"><code># a
-externes &lt;- log |&gt; filter(!str_detect(ip, &quot;^192\\.168\\.&quot;))
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>externes &lt;- log |&gt; filter(!str_detect(ip, &quot;^192\\.168\\.&quot;))
 n_externes &lt;- nrow(externes)
 n_ip_externes &lt;- n_distinct(externes$ip)</code></pre>
 <p>25 requêtes viennent de l’extérieur du réseau interne, depuis 2
 adresses distinctes.</p>
-<pre class="r"><code># b
-ip_externes &lt;- externes |&gt;
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>ip_externes &lt;- externes |&gt;
   group_by(ip) |&gt;
   summarise(
     requetes = n(),
@@ -1308,9 +1169,276 @@ ip_externes</code></pre>
 requêtes avec 5 utilisateurs différents, et elle cumule 0 erreurs et 0
 refus (401 ou 429), ce qui ressemble à des tentatives répétées d’accès
 non autorisé.</p>
-<pre class="r"><code># c
-all(str_detect(log$ip, &quot;^(\\d{1,3}\\.){3}\\d{1,3}$&quot;))</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>all(str_detect(log$ip, &quot;^(\\d{1,3}\\.){3}\\d{1,3}$&quot;))</code></pre>
 <pre><code>## [1] TRUE</code></pre>
+</div>
+</div>
+<div id="partie-d" class="section level1">
+<h1>Partie D</h1>
+<div id="d1" class="section level2">
+<h2>D1</h2>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>avis &lt;- read_csv(&quot;data/avis_clients.csv&quot;) |&gt;
+  mutate(id_avis = row_number(), longueur = str_length(texte))</code></pre>
+<pre><code>## Rows: 180 Columns: 5
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (2): produit, texte
+## dbl  (2): id_avis, note
+## date (1): date
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>avis_long &lt;- avis[which.max(avis$longueur), ]</code></pre>
+<p>La longueur moyenne d’un avis est de 42.6 caractères. L’avis le plus
+long (81 caractères) est : « EXCELLENT RAPPORT QUALITÉ/PRIX ! TRÈS
+SATISFAIT ! CONFORTABLE DÈS LE PREMIER JOUR ».</p>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>avis &lt;- avis |&gt;
+  mutate(majuscules = texte == str_to_upper(texte) &amp; str_detect(texte, &quot;[[:alpha:]]&quot;))
+
+avis |&gt;
+  group_by(majuscules) |&gt;
+  summarise(qtn = n(), note_moyenne = mean(note))</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   majuscules   qtn note_moyenne
+##   &lt;lgl&gt;      &lt;int&gt;        &lt;dbl&gt;
+## 1 FALSE        164         3.85
+## 2 TRUE          16         3.94</code></pre>
+<p>16 avis sont entièrement en majuscules. Leur note moyenne est de 3.94
+contre 3.85 pour les autres.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>n_exclamation &lt;- sum(str_detect(avis$texte, &quot;!&quot;))
+n_emoticone &lt;- sum(str_detect(avis$texte, &quot;:[()]&quot;))</code></pre>
+<p>38 avis contiennent au moins un point d’exclamation et 14 contiennent
+un émoticône.</p>
+</div>
+<div id="d2" class="section level2">
+<h2>D2</h2>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>mots &lt;- avis |&gt;
+  mutate(mot = str_split(str_to_lower(texte), &quot;[^\\p{L}&#39;’]+&quot;)) |&gt;
+  unnest(mot) |&gt;
+  filter(mot != &quot;&quot;) |&gt;
+  select(id_avis, produit, note, mot)
+
+mots</code></pre>
+<pre><code>## # A tibble: 1,169 × 4
+##    id_avis produit             note mot       
+##      &lt;int&gt; &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;     
+##  1       1 Veste pluie légère     1 trop      
+##  2       1 Veste pluie légère     1 cher      
+##  3       1 Veste pluie légère     1 pour      
+##  4       1 Veste pluie légère     1 ce        
+##  5       1 Veste pluie légère     1 que       
+##  6       1 Veste pluie légère     1 c&#39;est     
+##  7       2 Gourde isotherme       5 je        
+##  8       2 Gourde isotherme       5 recommande
+##  9       2 Gourde isotherme       5 et        
+## 10       2 Gourde isotherme       5 excellent 
+## # ℹ 1,159 more rows</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>n_mots &lt;- nrow(mots)
+n_distincts &lt;- n_distinct(mots$mot)</code></pre>
+<p>Il y a 1169 mots au total et 64 mots distincts.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>top10 &lt;- mots |&gt; count(mot, sort = TRUE) |&gt; head(10)
+top10</code></pre>
+<pre><code>## # A tibble: 10 × 2
+##    mot            n
+##    &lt;chr&gt;      &lt;int&gt;
+##  1 et            72
+##  2 qualité       54
+##  3 la            53
+##  4 satisfait     38
+##  5 très          38
+##  6 le            37
+##  7 livraison     37
+##  8 je            36
+##  9 recommande    36
+## 10 pour          34</code></pre>
+<pre class="r"><code>mots_vides &lt;- c(&quot;de&quot;, &quot;du&quot;, &quot;des&quot;, &quot;la&quot;, &quot;le&quot;, &quot;les&quot;, &quot;et&quot;, &quot;un&quot;, &quot;une&quot;, &quot;pour&quot;, &quot;ce&quot;,
+                &quot;que&quot;, &quot;au&quot;, &quot;à&quot;, &quot;je&quot;, &quot;ne&quot;, &quot;pas&quot;, &quot;c&#39;est&quot;, &quot;est&quot;, &quot;s&#39;est&quot;, &quot;dès&quot;, &quot;en&quot;)
+
+mots_utiles &lt;- mots |&gt; filter(!mot %in% mots_vides)
+top10_utiles &lt;- mots_utiles |&gt; count(mot, sort = TRUE) |&gt; head(10)
+top10_utiles</code></pre>
+<pre><code>## # A tibble: 10 × 2
+##    mot            n
+##    &lt;chr&gt;      &lt;int&gt;
+##  1 qualité       54
+##  2 satisfait     38
+##  3 très          38
+##  4 livraison     37
+##  5 recommande    36
+##  6 conforme      32
+##  7 rapide        30
+##  8 produit       29
+##  9 super         29
+## 10 bonne         28</code></pre>
+<p>Les 10 mots les plus fréquents sont : et, qualité, la, satisfait,
+très, le, livraison, je, recommande, pour. Sans les mots vides, ce sont
+: qualité, satisfait, très, livraison, recommande, conforme, rapide,
+produit, super, bonne.</p>
+</div>
+<div id="d3" class="section level2">
+<h2>D3</h2>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>mots_utiles &lt;- mots_utiles |&gt;
+  mutate(categorie = case_when(note &lt;= 2 ~ &quot;négatif&quot;, note == 3 ~ &quot;neutre&quot;, TRUE ~ &quot;positif&quot;))
+
+top5_categories &lt;- mots_utiles |&gt;
+  count(categorie, mot, sort = TRUE) |&gt;
+  group_by(categorie) |&gt;
+  slice_max(n, n = 5, with_ties = FALSE) |&gt;
+  ungroup()
+top5_categories</code></pre>
+<pre><code>## # A tibble: 15 × 3
+##    categorie mot            n
+##    &lt;chr&gt;     &lt;chr&gt;      &lt;int&gt;
+##  1 neutre    fait          11
+##  2 neutre    travail       11
+##  3 neutre    lourd         10
+##  4 neutre    peu           10
+##  5 neutre    correct        9
+##  6 négatif   trop          13
+##  7 négatif   recommande     9
+##  8 négatif   petite         8
+##  9 négatif   taille         8
+## 10 négatif   bout           7
+## 11 positif   qualité       50
+## 12 positif   satisfait     38
+## 13 positif   très          38
+## 14 positif   bonne         28
+## 15 positif   parfait       28</code></pre>
+<pre class="r"><code>liste_top5 &lt;- top5_categories |&gt;
+  group_by(categorie) |&gt;
+  summarise(mots = paste(mot, collapse = &quot;, &quot;)) |&gt;
+  deframe()</code></pre>
+<p>Les 5 mots les plus fréquents sont : pour les avis négatifs, trop,
+recommande, petite, taille, bout ; pour les avis neutres, fait, travail,
+lourd, peu, correct ; pour les avis positifs, qualité, satisfait, très,
+bonne, parfait.</p>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>notes_mots &lt;- mots_utiles |&gt;
+  distinct(id_avis, mot, note) |&gt;
+  group_by(mot) |&gt;
+  summarise(qtn = n(), note_moyenne = mean(note)) |&gt;
+  filter(qtn &gt;= 10)
+
+meilleurs &lt;- notes_mots |&gt; slice_max(note_moyenne, n = 5, with_ties = FALSE)
+pires &lt;- notes_mots |&gt; slice_min(note_moyenne, n = 5, with_ties = FALSE)
+meilleurs</code></pre>
+<pre><code>## # A tibble: 5 × 3
+##   mot         qtn note_moyenne
+##   &lt;chr&gt;     &lt;int&gt;        &lt;dbl&gt;
+## 1 léger        21         4.71
+## 2 solide       21         4.71
+## 3 satisfait    38         4.66
+## 4 très         38         4.66
+## 5 bonne        28         4.64</code></pre>
+<pre class="r"><code>pires</code></pre>
+<pre><code>## # A tibble: 5 × 3
+##   mot      qtn note_moyenne
+##   &lt;chr&gt;  &lt;int&gt;        &lt;dbl&gt;
+## 1 trop      16         1.75
+## 2 petite    11         1.82
+## 3 taille    11         1.82
+## 4 fait      11         3   
+## 5 lourd     10         3</code></pre>
+<p>Les mots associés aux meilleures notes sont léger, solide, satisfait,
+très, bonne et ceux associés aux pires notes sont trop, petite, taille,
+fait, lourd.</p>
+</div>
+<div id="d4" class="section level2">
+<h2>D4</h2>
+<pre class="r"><code>lex_positif &lt;- c(&quot;satisfait&quot;, &quot;excellent&quot;, &quot;rapide&quot;, &quot;confortable&quot;, &quot;recommande&quot;, &quot;parfait&quot;,
+&quot;solide&quot;, &quot;léger&quot;, &quot;super&quot;, &quot;bonne&quot;, &quot;conforme&quot;, &quot;correct&quot;)
+lex_negatif &lt;- c(&quot;déçu&quot;, &quot;petite&quot;, &quot;retard&quot;, &quot;cassé&quot;, &quot;étanche&quot;, &quot;injoignable&quot;, &quot;cher&quot;,
+&quot;fragile&quot;, &quot;mauvaise&quot;, &quot;lourd&quot;)</code></pre>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>mots_sentiment &lt;- avis |&gt;
+  mutate(
+    texte = str_replace_all(str_to_lower(texte), &quot;ne recommande pas&quot;, &quot;déconseille&quot;),
+    mot = str_split(texte, &quot;[^\\p{L}&#39;’]+&quot;)
+  ) |&gt;
+  unnest(mot) |&gt;
+  filter(mot != &quot;&quot;)
+
+scores &lt;- mots_sentiment |&gt;
+  group_by(id_avis) |&gt;
+  summarise(positifs = sum(mot %in% lex_positif), negatifs = sum(mot %in% lex_negatif))
+
+avis_score &lt;- avis |&gt;
+  left_join(scores, by = &quot;id_avis&quot;) |&gt;
+  mutate(score = positifs - negatifs)
+
+avis_score |&gt; select(id_avis, note, positifs, negatifs, score) |&gt; head(10)</code></pre>
+<pre><code>## # A tibble: 10 × 5
+##    id_avis  note positifs negatifs score
+##      &lt;int&gt; &lt;dbl&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+##  1       1     1        0        1    -1
+##  2       2     5        3        0     3
+##  3       3     5        2        0     2
+##  4       4     2        0        1    -1
+##  5       5     5        3        0     3
+##  6       6     5        3        0     3
+##  7       7     1        0        1    -1
+##  8       8     5        1        0     1
+##  9       9     4        1        0     1
+## 10      10     5        1        0     1</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>correlation &lt;- cor(avis_score$score, avis_score$note, use = &quot;complete.obs&quot;)
+correlation</code></pre>
+<pre><code>## [1] 0.8205517</code></pre>
+<p>La corrélation entre le score et la note est de 0.82 : le score est
+un bon indicateur de la note.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>contradictoires &lt;- avis_score |&gt;
+  filter((score &gt; 0 &amp; note &lt;= 2) | (score &lt; 0 &amp; note &gt;= 4))
+
+triste &lt;- avis_score |&gt;
+  filter(str_detect(texte, &quot;:\\(&quot;)) |&gt;
+  select(id_avis, note, score, texte)
+triste</code></pre>
+<pre><code>## # A tibble: 7 × 4
+##   id_avis  note score texte                                                     
+##     &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;                                                     
+## 1       5     5     3 Très satisfait. conforme à la description. je recommande …
+## 2      58     4     2 Excellent rapport qualité/prix ! livraison rapide :(      
+## 3      84     5     4 Super produit ! je recommande ! solide et léger :(        
+## 4      98     4     1 JE RECOMMANDE :(                                          
+## 5     137     1    -1 Je ne recommande pas et déçu :(                           
+## 6     164     4     2 Confortable dès le premier jour ! très satisfait :(       
+## 7     177     5     2 LIVRAISON RAPIDE ET TRÈS SATISFAIT :(</code></pre>
+<p>0 avis se contredisent. Les 7 avis avec un émoticône « :( » ont une
+note moyenne de 4 et un score moyen de 1.86 : le score ne tient pas
+compte de l’émoticône, qui exprime pourtant la déception.</p>
 </div>
 </div>
 
