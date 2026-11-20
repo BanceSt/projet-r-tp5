@@ -362,6 +362,16 @@ display: none;
 <li><a href="#a3" id="toc-a3">A3</a></li>
 <li><a href="#a4" id="toc-a4">A4</a></li>
 </ul></li>
+<li><a href="#partie-b" id="toc-partie-b">Partie B</a>
+<ul>
+<li><a href="#b1" id="toc-b1">B1</a></li>
+<li><a href="#b2" id="toc-b2">B2</a></li>
+<li><a href="#b3" id="toc-b3">B3</a></li>
+<li><a href="#b4" id="toc-b4">B4</a></li>
+<li><a href="#b5" id="toc-b5">B5</a></li>
+<li><a href="#b6" id="toc-b6">B6</a></li>
+<li><a href="#b7" id="toc-b7">B7</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -492,6 +502,739 @@ chaine est un nombre, au lieu de regarder partout il suffit de supprimer
 “^” et le “$”.</p>
 <pre class="r"><code>str_detect(&quot;prix : 1500 €&quot;, &quot;\\d+&quot;)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
+<p>str_replace(“2026-01-15”, “(\d+)-(\d+)-(\d+)”, “\3/\2/\1”) est
+correcte.</p>
+<pre class="r"><code>str_replace(&quot;2026-01-15&quot;, &quot;(\\d+)-(\\d+)-(\\d+)&quot;, &quot;\\3/\\2/\\1&quot;) </code></pre>
+<pre><code>## [1] &quot;15/01/2026&quot;</code></pre>
+<p>str_detect(c(“Photo”, “photo”), “^photo”), Ce regex verife que les
+miniscule, il faut juste ajoute le cas de la majuscule</p>
+<pre class="r"><code>str_detect(c(&quot;Photo&quot;, &quot;photo&quot;), &quot;^(P|p)hoto&quot;)</code></pre>
+<pre><code>## [1] TRUE TRUE</code></pre>
+</div>
+</div>
+<div id="partie-b" class="section level1">
+<h1>Partie B</h1>
+<div id="b1" class="section level2">
+<h2>B1</h2>
+<pre class="r"><code>contacts_bruts &lt;- read.csv(&quot;data/contacts_bruts.csv&quot;)
+head(contacts_bruts, 10)</code></pre>
+<pre><code>##      id               nom                     email      telephone
+## 1  C001   valérie   fall      valerie.fall@yahoo.fr               
+## 2  C002       JADE GIRARD       jade.girard@free.fr 04 50 22 51 38
+## 3  C003    Chen Chevalier  chen.chevalier@orange.fr 01 02 23 14 73
+## 4  C004     awa   ndiaye      awa.ndiaye@lecnam.net 01 98 84 59 09
+## 5  C005        Gaël Mbaye     gael.mbaye@lecnam.net     0457052677
+## 6  C006    Rokhaya Benali   rokhaya.benali@yahoo.fr 06 40 95 18 29
+## 7  C007          Awa Faye         awa.faye@yahoo.fr     0724337204
+## 8  C008   Clémence Garcia clemence.garcia@orange.fr 01.72.83.18.14
+## 9  C009       Jade Martin    jade.martin@lecnam.net 06-08-50-10-27
+## 10 C010      Wang, Moussa       moussa.wangyahoo.fr 07 73 32 60 45
+##                                         adresse inscription
+## 1                    1 bd Gambetta, 75020 PARIS  24/08/2023
+## 2               38 impasse Pasteur, 59000 Lille  20/02/2025
+## 3          66 boulevard de la Paix, 75011 Paris  20/08/2025
+## 4             46 avenue de la Paix, 75011 PARIS  02/09/2024
+## 5  9 boulevard de la République, 31000 TOULOUSE  22/07/2025
+## 6      79 avenue de la République, 44000 Nantes  20/02/2025
+## 7               85 rue Gambetta, 31000 TOULOUSE  02/09/2025
+## 8           75 bd de la Paix, 34000 MONTPELLIER  2025-09-05
+## 9        37 impasse Gambetta, 93200 Saint-Denis  2025-03-02
+## 10     29 Rue de la République, 13005 Marseille  14/07/2023</code></pre>
+<p>Les ids suivent le même formats : “CXXX”.</p>
+<p>Les différents formats des noms : “prenom nom”, “PRENOM NOM”, “Prenom
+Nom”, “Prenom, Nom”.</p>
+<p>Les différents formets de mails : “prenom.nom@fournisseur.domain”,
+“prenom.nomfournisseur.domain”</p>
+<p>Les différents formats de numéro de téléphone : “XX XX XX XX XX”,
+“XXXXXXXXXX”, “XX.XX.XX.XX.XX”, “XX-XX-XX-XX-XX”.</p>
+<p>Les différents formats de numéro d’adresse : “NUMERO lieu, CODEPOSTAL
+Ville”, “NUMERO Lieu, CODEPOSTAL Ville”, “NUMERO lieu, CODEPOSTAL
+VILLE”</p>
+<p>Les différents formats de date : “XX/XX/XXXX”, “XXXX-XX-XX”</p>
+</div>
+<div id="b2" class="section level2">
+<h2>B2</h2>
+<pre class="r"><code>contacts_bruts &lt;- contacts_bruts %&gt;%
+  mutate(across(where(is.character), str_trim))
+
+contacts_bruts = contacts_bruts |&gt; 
+  mutate(
+    nom_complet = nom,
+    nom = case_when(
+      str_detect(nom_complet, &quot;,&quot;) ~ str_trim(str_remove(nom_complet, &quot;,.*$&quot;)),
+      str_detect(nom_complet, &quot;([A-Z]+\\s+)+[A-Z][a-z]+&quot;) ~ str_extract(nom_complet, &quot;([[:upper:]])+&quot;),
+      TRUE ~ str_trim(str_remove(nom_complet, &quot;^\\S+\\s+&quot;))
+    ),
+    prenom = case_when(
+      str_detect(nom_complet, &quot;,&quot;) ~ str_trim(str_remove(nom_complet, &quot;^.*,\\s*&quot;)),
+      str_detect(nom_complet, &quot;([A-Z]+\\s+)+[A-Z][a-z]+&quot;) ~ str_trim(str_remove(nom_complet, &quot;^\\S+\\s+&quot;)),
+      TRUE ~ word(nom_complet, 1)
+    )
+  )
+contacts_bruts</code></pre>
+<pre><code>##      id       nom                        email         telephone
+## 1  C001      fall        valerie.fall@yahoo.fr                  
+## 2  C002    GIRARD          jade.girard@free.fr    04 50 22 51 38
+## 3  C003 Chevalier     chen.chevalier@orange.fr    01 02 23 14 73
+## 4  C004    ndiaye        awa.ndiaye@lecnam.net    01 98 84 59 09
+## 5  C005     Mbaye        gael.mbaye@lecnam.net        0457052677
+## 6  C006    Benali      rokhaya.benali@yahoo.fr    06 40 95 18 29
+## 7  C007      Faye            awa.faye@yahoo.fr        0724337204
+## 8  C008    Garcia    clemence.garcia@orange.fr    01.72.83.18.14
+## 9  C009    Martin       jade.martin@lecnam.net    06-08-50-10-27
+## 10 C010      Wang          moussa.wangyahoo.fr    07 73 32 60 45
+## 11 C011    DIALLO      quentin.diallo@yahoo.fr        0112118638
+## 12 C012    Benali     rokhaya.benali@gmail.com        0669201756
+## 13 C013      diop           sami.diop@yahoo.fr    06 52 63 68 30
+## 14 C014    Girard       djibril.girard@free.fr    04 69 18 79 54
+## 15 C015    DURAND         dina.durand@yahoo.fr +33 6 59 38 97 79
+## 16 C016    Benali         GAEL.BENALI@YAHOO.FR   +33(0)606357730
+## 17 C017      FALL     clemence.fall@outlook.fr    06 85 48 12 30
+## 18 C018    girard          THEO.GIRARD@FREE.FR    06.96.51.76.39
+## 19 C019   le goff     wassim.legoff@outlook.fr        0605942424
+## 20 C020    Girard     pauline.girard@orange.fr    06 87 48 27 91
+## 21 C021      FALL       PAULINE.FALLOUTLOOK.FR        0662741559
+## 22 C022    NGUYEN        elias.nguyen@yahoo.fr        0755004142
+## 23 C023  Fontaine   wassim.fontaine@outlook.fr    06 45 16 25 00
+## 24 C024     MBAYE            awa.mbaye@free.fr    06 68 66 82 64
+## 25 C025   LAMBERT    valerie.lambert@gmail.com    06.37.15.35.13
+## 26 C026    ndiaye           zoe.ndiaye@outlook        0686355998
+## 27 C027      Kone      YASMINE.KONE@OUTLOOK.FR   +33(0)695986200
+## 28 C028     BLANC        ulysse.blanc@@free.fr    06 83 42 80 89
+## 29 C029    Durand       aminata.durand@free.fr    07 83 60 61 89
+## 30 C030        LE        nora.legoff@orange.fr    04 78 18 55 51
+## 31 C031    garcia           zoe.garcia@free.fr    04.20.59.96.71
+## 32 C032     Blanc       elise.blanc@lecnam.net   +33(0)180292645
+## 33 C033        Ba              omar.ba@free.fr           inconnu
+## 34 C034     ROBIN      rokhaya.robin@orange.fr   +33(0)742413230
+## 35 C035        Ba          djibril.ba@yahoo.fr        0618909239
+## 36 C036    haddad       nora.haddad@outlook.fr    04 34 45 51 82
+## 37 C037    Haddad    pauline.haddad@lecnam.net    04 85 92 03 37
+## 38 C038      wang         chen.wang@lecnam.net        0174081019
+## 39 C039   Bernard        gael.bernard@yahoo.fr    01 21 24 00 85
+## 40 C040   Bernard    valerie.bernard@orange.fr        0679647533
+## 41 C041   mercier            awa.mercier@gmail    07 37 03 72 16
+## 42 C042    Diallo   baptiste.diallo@lecnam.net   +33(0)666892117
+## 43 C043     MBAYE          FATOU.MBAYE@FREE.FR        0643083425
+## 44 C044    DURAND          chen.durand@free.fr          06 12 34
+## 45 C045   lefèvre   quentin.lefevre@outlook.fr +33 7 19 17 22 70
+## 46 C046    Diallo    aminata.diallo@lecnam.net   +33(0)192565765
+## 47 C047      KONE                                +33(0)461401802
+## 48 C048 Chevalier  aminata.chevalier@orange.fr    06 43 51 05 19
+## 49 C049    Girard      djibril.girard@yahoo.fr        0180357856
+## 50 C050   Le Goff           lea.legoff@free.fr    07 32 68 82 35
+## 51 C051      Diop           theo.diop@yahoo.fr        0685386166
+## 52 C052      Fall           dina.fall@yahoo.fr    01 74 21 68 91
+## 53 C053     Mbaye        DJIBRIL.MBAYE@FREE.FR    01-35-20-13-64
+## 54 C054   lefèvre         awa.lefevre@yahoo.fr    04 66 65 52 26
+## 55 C055    DIALLO       CHEN.DIALLO@LECNAM.NET   +33(0)751922467
+## 56 C056       Sow       rokhaya.sow@outlook.fr    04-43-01-84-88
+## 57 C057      ROUX      clemence.roux@gmail.com    06.30.59.56.06
+## 58 C058 Chevalier pauline.chevalier@outlook.fr    06 96 58 78 93
+## 59 C059 Chevalier     ines.chevalier@gmail.com        0649624385
+## 60 C060    DUPONT       wassim.dupont@yahoo.fr    07-80-31-99-53
+##                                            adresse inscription
+## 1                       1 bd Gambetta, 75020 PARIS  24/08/2023
+## 2                  38 impasse Pasteur, 59000 Lille  20/02/2025
+## 3             66 boulevard de la Paix, 75011 Paris  20/08/2025
+## 4                46 avenue de la Paix, 75011 PARIS  02/09/2024
+## 5     9 boulevard de la République, 31000 TOULOUSE  22/07/2025
+## 6         79 avenue de la République, 44000 Nantes  20/02/2025
+## 7                  85 rue Gambetta, 31000 TOULOUSE  02/09/2025
+## 8              75 bd de la Paix, 34000 MONTPELLIER  2025-09-05
+## 9           37 impasse Gambetta, 93200 Saint-Denis  2025-03-02
+## 10        29 Rue de la République, 13005 Marseille  14/07/2023
+## 11                     56 Rue Pasteur, 75011 PARIS  2025-02-07
+## 12              45 rue de la Paix, 13005 Marseille  25/10/2024
+## 13                   62 Av. Gambetta, 35000 RENNES  2024-09-17
+## 14         31 impasse de la Paix, 67000 Strasbourg  19/07/2024
+## 15             68 Rue Saint-Martin, 33800 Bordeaux  20/01/2023
+## 16        98 impasse de la République, 75020 Paris  2024-03-27
+## 17            89 rue Victor Hugo, 67000 Strasbourg  14/08/2025
+## 18     71 boulevard Victor Hugo, 34000 Montpellier  2023-11-29
+## 19                94 Av. des Lilas, 33800 BORDEAUX  2024-09-14
+## 20             11 place Gambetta, 67000 Strasbourg  2024-05-13
+## 21        64 rue de la République, 13005 Marseille  02/09/2025
+## 22           72 rue de la République, 35000 Rennes    19-05-24
+## 23             76 bd de la République, 75011 PARIS  17/04/2025
+## 24              83 boulevard des Lilas, 06000 Nice    23-12-24
+## 25               40 Av. Saint-Martin, 44000 Nantes  15/08/2024
+## 26           61 avenue Jean Jaurès, 31000 Toulouse  2024-04-22
+## 27            59 boulevard Victor Hugo, 06000 NICE  05/05/2023
+## 28                 45 rue Saint-Martin, 69007 LYON  05/09/2025
+## 29             44 place Saint-Martin, 35000 Rennes  06/07/2025
+## 30               44 avenue Jean Jaurès, 69007 LYON  18/06/2023
+## 31              2 boulevard de la Paix, 69007 LYON    15-03-24
+## 32     99 place du Général de Gaulle, 35000 Rennes  20/05/2023
+## 33              57 boulevard des Lilas, 69007 Lyon  05/06/2024
+## 34             113 Av. Gambetta, 93200 SAINT-DENIS  11/03/2025
+## 35         111 impasse Victor Hugo, 31000 Toulouse  15/05/2025
+## 36               44 avenue Jean Jaurès, 06000 NICE  03/01/2024
+## 37              1 avenue Jean Jaurès, 35000 RENNES    12-01-23
+## 38                 34 rue Gambetta, 33800 Bordeaux  04/07/2025
+## 39               101 Rue des Lilas, 31000 TOULOUSE  12/11/2023
+## 40         81 avenue de la Paix, 93200 Saint-Denis    11-04-25
+## 41                   6 rue de la Paix, 59000 Lille  11/01/2025
+## 42        106 rue du Général de Gaulle, 69007 LYON  2025-02-28
+## 43         82 avenue de la République, 75020 PARIS    22-06-24
+## 44    114 boulevard de la République, 35000 Rennes  2023-12-05
+## 45                 31 avenue Gambetta, 75020 PARIS  16/06/2023
+## 46             114 Av. Jean Jaurès, 31000 Toulouse  2025-08-09
+## 47               57 Av. Saint-Martin, 35000 Rennes  2025-05-31
+## 48  9 boulevard de la République, 67000 STRASBOURG  28/11/2023
+## 49             94 avenue Victor Hugo, 44000 Nantes  20/06/2024
+## 50            27 boulevard des Lilas, 44000 NANTES    25-03-25
+## 51   29 impasse de la République, 67000 STRASBOURG  06/12/2023
+## 52                  41 Rue des Lilas, 44000 Nantes  18/12/2023
+## 53            103 Rue Saint-Martin, 31000 Toulouse  08/05/2024
+## 54        117 boulevard de la Paix, 31000 Toulouse  26/12/2023
+## 55                     53 rue Gambetta, 06000 Nice  28/04/2024
+## 56               60 Av. des Lilas, 13005 MARSEILLE  01/08/2024
+## 57         14 avenue Saint-Martin, 13005 Marseille  12/08/2023
+## 58            80 Rue de la République, 75011 Paris  07/08/2023
+## 59              92 Av. des Lilas, 67000 Strasbourg    31-12-24
+## 60 89 impasse du Général de Gaulle, 33800 BORDEAUX    18-04-24
+##           nom_complet    prenom
+## 1      valérie   fall   valérie
+## 2         JADE GIRARD      JADE
+## 3      Chen Chevalier      Chen
+## 4        awa   ndiaye       awa
+## 5          Gaël Mbaye      Gaël
+## 6      Rokhaya Benali   Rokhaya
+## 7            Awa Faye       Awa
+## 8     Clémence Garcia  Clémence
+## 9         Jade Martin      Jade
+## 10       Wang, Moussa    Moussa
+## 11     DIALLO Quentin   Quentin
+## 12    Benali, Rokhaya   Rokhaya
+## 13        sami   diop      sami
+## 14     Djibril Girard   Djibril
+## 15        DURAND Dina      Dina
+## 16       Benali, Gaël      Gaël
+## 17      CLÉMENCE FALL  CLÉMENCE
+## 18      théo   girard      théo
+## 19   wassim   le goff    wassim
+## 20     Pauline Girard   Pauline
+## 21       PAULINE FALL   PAULINE
+## 22       ELIAS NGUYEN     ELIAS
+## 23    Wassim Fontaine    Wassim
+## 24          AWA MBAYE       AWA
+## 25    LAMBERT Valérie   Valérie
+## 26       zoé   ndiaye       zoé
+## 27       Yasmine Kone   Yasmine
+## 28       ULYSSE BLANC    ULYSSE
+## 29    Durand, Aminata   Aminata
+## 30       LE GOFF Nora GOFF Nora
+## 31       zoé   garcia       zoé
+## 32        Élise Blanc     Élise
+## 33            Omar Ba      Omar
+## 34      ROBIN Rokhaya   Rokhaya
+## 35         Djibril Ba   Djibril
+## 36      nora   haddad      nora
+## 37     Pauline Haddad   Pauline
+## 38        chen   wang      chen
+## 39       Gaël Bernard      Gaël
+## 40    Valérie Bernard   Valérie
+## 41      awa   mercier       awa
+## 42    Baptiste Diallo  Baptiste
+## 43        MBAYE Fatou     Fatou
+## 44        DURAND Chen      Chen
+## 45  quentin   lefèvre   quentin
+## 46     Aminata Diallo   Aminata
+## 47          KONE Nora      Nora
+## 48 Chevalier, Aminata   Aminata
+## 49     Djibril Girard   Djibril
+## 50        Léa Le Goff       Léa
+## 51         Diop, Théo      Théo
+## 52         Fall, Dina      Dina
+## 53      Djibril Mbaye   Djibril
+## 54      awa   lefèvre       awa
+## 55        DIALLO Chen      Chen
+## 56        Rokhaya Sow   Rokhaya
+## 57      CLÉMENCE ROUX  CLÉMENCE
+## 58 Chevalier, Pauline   Pauline
+## 59    Chevalier, Inès      Inès
+## 60      DUPONT Wassim    Wassim</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>contacts_bruts |&gt; 
+  mutate(
+    prenom = str_to_upper(substr(prenom, start = 1, stop =1)),
+    nom = str_to_upper(nom)
+  ) |&gt; 
+  select(
+    prenom,
+    nom,
+    nom_complet
+  )</code></pre>
+<pre><code>##    prenom       nom        nom_complet
+## 1       V      FALL     valérie   fall
+## 2       J    GIRARD        JADE GIRARD
+## 3       C CHEVALIER     Chen Chevalier
+## 4       A    NDIAYE       awa   ndiaye
+## 5       G     MBAYE         Gaël Mbaye
+## 6       R    BENALI     Rokhaya Benali
+## 7       A      FAYE           Awa Faye
+## 8       C    GARCIA    Clémence Garcia
+## 9       J    MARTIN        Jade Martin
+## 10      M      WANG       Wang, Moussa
+## 11      Q    DIALLO     DIALLO Quentin
+## 12      R    BENALI    Benali, Rokhaya
+## 13      S      DIOP        sami   diop
+## 14      D    GIRARD     Djibril Girard
+## 15      D    DURAND        DURAND Dina
+## 16      G    BENALI       Benali, Gaël
+## 17      C      FALL      CLÉMENCE FALL
+## 18      T    GIRARD      théo   girard
+## 19      W   LE GOFF   wassim   le goff
+## 20      P    GIRARD     Pauline Girard
+## 21      P      FALL       PAULINE FALL
+## 22      E    NGUYEN       ELIAS NGUYEN
+## 23      W  FONTAINE    Wassim Fontaine
+## 24      A     MBAYE          AWA MBAYE
+## 25      V   LAMBERT    LAMBERT Valérie
+## 26      Z    NDIAYE       zoé   ndiaye
+## 27      Y      KONE       Yasmine Kone
+## 28      U     BLANC       ULYSSE BLANC
+## 29      A    DURAND    Durand, Aminata
+## 30      G        LE       LE GOFF Nora
+## 31      Z    GARCIA       zoé   garcia
+## 32      É     BLANC        Élise Blanc
+## 33      O        BA            Omar Ba
+## 34      R     ROBIN      ROBIN Rokhaya
+## 35      D        BA         Djibril Ba
+## 36      N    HADDAD      nora   haddad
+## 37      P    HADDAD     Pauline Haddad
+## 38      C      WANG        chen   wang
+## 39      G   BERNARD       Gaël Bernard
+## 40      V   BERNARD    Valérie Bernard
+## 41      A   MERCIER      awa   mercier
+## 42      B    DIALLO    Baptiste Diallo
+## 43      F     MBAYE        MBAYE Fatou
+## 44      C    DURAND        DURAND Chen
+## 45      Q   LEFÈVRE  quentin   lefèvre
+## 46      A    DIALLO     Aminata Diallo
+## 47      N      KONE          KONE Nora
+## 48      A CHEVALIER Chevalier, Aminata
+## 49      D    GIRARD     Djibril Girard
+## 50      L   LE GOFF        Léa Le Goff
+## 51      T      DIOP         Diop, Théo
+## 52      D      FALL         Fall, Dina
+## 53      D     MBAYE      Djibril Mbaye
+## 54      A   LEFÈVRE      awa   lefèvre
+## 55      C    DIALLO        DIALLO Chen
+## 56      R       SOW        Rokhaya Sow
+## 57      C      ROUX      CLÉMENCE ROUX
+## 58      P CHEVALIER Chevalier, Pauline
+## 59      I CHEVALIER    Chevalier, Inès
+## 60      W    DUPONT      DUPONT Wassim</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>On peut voir que le nom à particule “LE GOFF” tous en majuscule pose
+problème avec notre regex.</li>
+</ol>
+</div>
+<div id="b3" class="section level2">
+<h2>B3</h2>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>contacts_bruts = contacts_bruts |&gt; 
+  mutate(email = str_to_lower(email))
+
+req_email &lt;- &quot;^[a-z0-9._-]+@[a-z0-9._-]+\\.[a-z]{2,4}$&quot;</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>n_invalide_mail &lt;- sum(str_detect(contacts_bruts[[&quot;email&quot;]], req_email, TRUE))</code></pre>
+<p>Il y a 6 emails invalides.</p>
+<pre class="r"><code>contacts_bruts |&gt; 
+  filter(
+    str_detect(contacts_bruts[[&quot;email&quot;]], req_email, TRUE)
+  ) |&gt; 
+  select(
+    nom_complet,
+    email
+  )</code></pre>
+<pre><code>##     nom_complet                  email
+## 1  Wang, Moussa    moussa.wangyahoo.fr
+## 2  PAULINE FALL pauline.falloutlook.fr
+## 3  zoé   ndiaye     zoe.ndiaye@outlook
+## 4  ULYSSE BLANC  ulysse.blanc@@free.fr
+## 5 awa   mercier      awa.mercier@gmail
+## 6     KONE Nora</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Top des domaines les plus frequemment utilisés.</li>
+</ol>
+<pre class="r"><code>contacts_bruts |&gt; 
+  filter(
+    str_detect(contacts_bruts[[&quot;email&quot;]], req_email)
+  )|&gt; 
+
+  group_by(extension =  str_match(email, &quot;@([a-z0-9._-]+)\\.&quot;)[, 2]) |&gt; 
+  summarise(
+    nb_contacts = n()
+  ) |&gt; 
+  
+  arrange(desc(nb_contacts))</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   extension nb_contacts
+##   &lt;chr&gt;           &lt;int&gt;
+## 1 yahoo              15
+## 2 free               11
+## 3 lecnam              9
+## 4 outlook             8
+## 5 orange              7
+## 6 gmail               4</code></pre>
+</div>
+<div id="b4" class="section level2">
+<h2>B4</h2>
+<pre class="r"><code>contacts_bruts = contacts_bruts |&gt; 
+  mutate(
+    telephone = str_replace(telephone, &quot;^\\+33(\\(0\\))?\\s?&quot;, &quot;0&quot;),
+    
+    telephone = str_replace(telephone, &quot;(\\d{2})(?:\\.|-)?(\\d{2})(?:\\.|-)?(\\d{2})(?:\\.|-)?(\\d{2})(?:\\.|-)?(\\d{2})&quot;, &quot;\\1 \\2 \\3 \\4 \\5&quot;),
+    
+    telephone = ifelse(
+      str_detect(telephone, &quot;^0\\d(\\s\\d{2}){4}$&quot;), 
+      telephone, 
+      NA
+    )
+  )
+contacts_bruts</code></pre>
+<pre><code>##      id       nom                        email      telephone
+## 1  C001      fall        valerie.fall@yahoo.fr           &lt;NA&gt;
+## 2  C002    GIRARD          jade.girard@free.fr 04 50 22 51 38
+## 3  C003 Chevalier     chen.chevalier@orange.fr 01 02 23 14 73
+## 4  C004    ndiaye        awa.ndiaye@lecnam.net 01 98 84 59 09
+## 5  C005     Mbaye        gael.mbaye@lecnam.net 04 57 05 26 77
+## 6  C006    Benali      rokhaya.benali@yahoo.fr 06 40 95 18 29
+## 7  C007      Faye            awa.faye@yahoo.fr 07 24 33 72 04
+## 8  C008    Garcia    clemence.garcia@orange.fr 01 72 83 18 14
+## 9  C009    Martin       jade.martin@lecnam.net 06 08 50 10 27
+## 10 C010      Wang          moussa.wangyahoo.fr 07 73 32 60 45
+## 11 C011    DIALLO      quentin.diallo@yahoo.fr 01 12 11 86 38
+## 12 C012    Benali     rokhaya.benali@gmail.com 06 69 20 17 56
+## 13 C013      diop           sami.diop@yahoo.fr 06 52 63 68 30
+## 14 C014    Girard       djibril.girard@free.fr 04 69 18 79 54
+## 15 C015    DURAND         dina.durand@yahoo.fr 06 59 38 97 79
+## 16 C016    Benali         gael.benali@yahoo.fr 06 06 35 77 30
+## 17 C017      FALL     clemence.fall@outlook.fr 06 85 48 12 30
+## 18 C018    girard          theo.girard@free.fr 06 96 51 76 39
+## 19 C019   le goff     wassim.legoff@outlook.fr 06 05 94 24 24
+## 20 C020    Girard     pauline.girard@orange.fr 06 87 48 27 91
+## 21 C021      FALL       pauline.falloutlook.fr 06 62 74 15 59
+## 22 C022    NGUYEN        elias.nguyen@yahoo.fr 07 55 00 41 42
+## 23 C023  Fontaine   wassim.fontaine@outlook.fr 06 45 16 25 00
+## 24 C024     MBAYE            awa.mbaye@free.fr 06 68 66 82 64
+## 25 C025   LAMBERT    valerie.lambert@gmail.com 06 37 15 35 13
+## 26 C026    ndiaye           zoe.ndiaye@outlook 06 86 35 59 98
+## 27 C027      Kone      yasmine.kone@outlook.fr 06 95 98 62 00
+## 28 C028     BLANC        ulysse.blanc@@free.fr 06 83 42 80 89
+## 29 C029    Durand       aminata.durand@free.fr 07 83 60 61 89
+## 30 C030        LE        nora.legoff@orange.fr 04 78 18 55 51
+## 31 C031    garcia           zoe.garcia@free.fr 04 20 59 96 71
+## 32 C032     Blanc       elise.blanc@lecnam.net 01 80 29 26 45
+## 33 C033        Ba              omar.ba@free.fr           &lt;NA&gt;
+## 34 C034     ROBIN      rokhaya.robin@orange.fr 07 42 41 32 30
+## 35 C035        Ba          djibril.ba@yahoo.fr 06 18 90 92 39
+## 36 C036    haddad       nora.haddad@outlook.fr 04 34 45 51 82
+## 37 C037    Haddad    pauline.haddad@lecnam.net 04 85 92 03 37
+## 38 C038      wang         chen.wang@lecnam.net 01 74 08 10 19
+## 39 C039   Bernard        gael.bernard@yahoo.fr 01 21 24 00 85
+## 40 C040   Bernard    valerie.bernard@orange.fr 06 79 64 75 33
+## 41 C041   mercier            awa.mercier@gmail 07 37 03 72 16
+## 42 C042    Diallo   baptiste.diallo@lecnam.net 06 66 89 21 17
+## 43 C043     MBAYE          fatou.mbaye@free.fr 06 43 08 34 25
+## 44 C044    DURAND          chen.durand@free.fr           &lt;NA&gt;
+## 45 C045   lefèvre   quentin.lefevre@outlook.fr 07 19 17 22 70
+## 46 C046    Diallo    aminata.diallo@lecnam.net 01 92 56 57 65
+## 47 C047      KONE                              04 61 40 18 02
+## 48 C048 Chevalier  aminata.chevalier@orange.fr 06 43 51 05 19
+## 49 C049    Girard      djibril.girard@yahoo.fr 01 80 35 78 56
+## 50 C050   Le Goff           lea.legoff@free.fr 07 32 68 82 35
+## 51 C051      Diop           theo.diop@yahoo.fr 06 85 38 61 66
+## 52 C052      Fall           dina.fall@yahoo.fr 01 74 21 68 91
+## 53 C053     Mbaye        djibril.mbaye@free.fr 01 35 20 13 64
+## 54 C054   lefèvre         awa.lefevre@yahoo.fr 04 66 65 52 26
+## 55 C055    DIALLO       chen.diallo@lecnam.net 07 51 92 24 67
+## 56 C056       Sow       rokhaya.sow@outlook.fr 04 43 01 84 88
+## 57 C057      ROUX      clemence.roux@gmail.com 06 30 59 56 06
+## 58 C058 Chevalier pauline.chevalier@outlook.fr 06 96 58 78 93
+## 59 C059 Chevalier     ines.chevalier@gmail.com 06 49 62 43 85
+## 60 C060    DUPONT       wassim.dupont@yahoo.fr 07 80 31 99 53
+##                                            adresse inscription
+## 1                       1 bd Gambetta, 75020 PARIS  24/08/2023
+## 2                  38 impasse Pasteur, 59000 Lille  20/02/2025
+## 3             66 boulevard de la Paix, 75011 Paris  20/08/2025
+## 4                46 avenue de la Paix, 75011 PARIS  02/09/2024
+## 5     9 boulevard de la République, 31000 TOULOUSE  22/07/2025
+## 6         79 avenue de la République, 44000 Nantes  20/02/2025
+## 7                  85 rue Gambetta, 31000 TOULOUSE  02/09/2025
+## 8              75 bd de la Paix, 34000 MONTPELLIER  2025-09-05
+## 9           37 impasse Gambetta, 93200 Saint-Denis  2025-03-02
+## 10        29 Rue de la République, 13005 Marseille  14/07/2023
+## 11                     56 Rue Pasteur, 75011 PARIS  2025-02-07
+## 12              45 rue de la Paix, 13005 Marseille  25/10/2024
+## 13                   62 Av. Gambetta, 35000 RENNES  2024-09-17
+## 14         31 impasse de la Paix, 67000 Strasbourg  19/07/2024
+## 15             68 Rue Saint-Martin, 33800 Bordeaux  20/01/2023
+## 16        98 impasse de la République, 75020 Paris  2024-03-27
+## 17            89 rue Victor Hugo, 67000 Strasbourg  14/08/2025
+## 18     71 boulevard Victor Hugo, 34000 Montpellier  2023-11-29
+## 19                94 Av. des Lilas, 33800 BORDEAUX  2024-09-14
+## 20             11 place Gambetta, 67000 Strasbourg  2024-05-13
+## 21        64 rue de la République, 13005 Marseille  02/09/2025
+## 22           72 rue de la République, 35000 Rennes    19-05-24
+## 23             76 bd de la République, 75011 PARIS  17/04/2025
+## 24              83 boulevard des Lilas, 06000 Nice    23-12-24
+## 25               40 Av. Saint-Martin, 44000 Nantes  15/08/2024
+## 26           61 avenue Jean Jaurès, 31000 Toulouse  2024-04-22
+## 27            59 boulevard Victor Hugo, 06000 NICE  05/05/2023
+## 28                 45 rue Saint-Martin, 69007 LYON  05/09/2025
+## 29             44 place Saint-Martin, 35000 Rennes  06/07/2025
+## 30               44 avenue Jean Jaurès, 69007 LYON  18/06/2023
+## 31              2 boulevard de la Paix, 69007 LYON    15-03-24
+## 32     99 place du Général de Gaulle, 35000 Rennes  20/05/2023
+## 33              57 boulevard des Lilas, 69007 Lyon  05/06/2024
+## 34             113 Av. Gambetta, 93200 SAINT-DENIS  11/03/2025
+## 35         111 impasse Victor Hugo, 31000 Toulouse  15/05/2025
+## 36               44 avenue Jean Jaurès, 06000 NICE  03/01/2024
+## 37              1 avenue Jean Jaurès, 35000 RENNES    12-01-23
+## 38                 34 rue Gambetta, 33800 Bordeaux  04/07/2025
+## 39               101 Rue des Lilas, 31000 TOULOUSE  12/11/2023
+## 40         81 avenue de la Paix, 93200 Saint-Denis    11-04-25
+## 41                   6 rue de la Paix, 59000 Lille  11/01/2025
+## 42        106 rue du Général de Gaulle, 69007 LYON  2025-02-28
+## 43         82 avenue de la République, 75020 PARIS    22-06-24
+## 44    114 boulevard de la République, 35000 Rennes  2023-12-05
+## 45                 31 avenue Gambetta, 75020 PARIS  16/06/2023
+## 46             114 Av. Jean Jaurès, 31000 Toulouse  2025-08-09
+## 47               57 Av. Saint-Martin, 35000 Rennes  2025-05-31
+## 48  9 boulevard de la République, 67000 STRASBOURG  28/11/2023
+## 49             94 avenue Victor Hugo, 44000 Nantes  20/06/2024
+## 50            27 boulevard des Lilas, 44000 NANTES    25-03-25
+## 51   29 impasse de la République, 67000 STRASBOURG  06/12/2023
+## 52                  41 Rue des Lilas, 44000 Nantes  18/12/2023
+## 53            103 Rue Saint-Martin, 31000 Toulouse  08/05/2024
+## 54        117 boulevard de la Paix, 31000 Toulouse  26/12/2023
+## 55                     53 rue Gambetta, 06000 Nice  28/04/2024
+## 56               60 Av. des Lilas, 13005 MARSEILLE  01/08/2024
+## 57         14 avenue Saint-Martin, 13005 Marseille  12/08/2023
+## 58            80 Rue de la République, 75011 Paris  07/08/2023
+## 59              92 Av. des Lilas, 67000 Strasbourg    31-12-24
+## 60 89 impasse du Général de Gaulle, 33800 BORDEAUX    18-04-24
+##           nom_complet    prenom
+## 1      valérie   fall   valérie
+## 2         JADE GIRARD      JADE
+## 3      Chen Chevalier      Chen
+## 4        awa   ndiaye       awa
+## 5          Gaël Mbaye      Gaël
+## 6      Rokhaya Benali   Rokhaya
+## 7            Awa Faye       Awa
+## 8     Clémence Garcia  Clémence
+## 9         Jade Martin      Jade
+## 10       Wang, Moussa    Moussa
+## 11     DIALLO Quentin   Quentin
+## 12    Benali, Rokhaya   Rokhaya
+## 13        sami   diop      sami
+## 14     Djibril Girard   Djibril
+## 15        DURAND Dina      Dina
+## 16       Benali, Gaël      Gaël
+## 17      CLÉMENCE FALL  CLÉMENCE
+## 18      théo   girard      théo
+## 19   wassim   le goff    wassim
+## 20     Pauline Girard   Pauline
+## 21       PAULINE FALL   PAULINE
+## 22       ELIAS NGUYEN     ELIAS
+## 23    Wassim Fontaine    Wassim
+## 24          AWA MBAYE       AWA
+## 25    LAMBERT Valérie   Valérie
+## 26       zoé   ndiaye       zoé
+## 27       Yasmine Kone   Yasmine
+## 28       ULYSSE BLANC    ULYSSE
+## 29    Durand, Aminata   Aminata
+## 30       LE GOFF Nora GOFF Nora
+## 31       zoé   garcia       zoé
+## 32        Élise Blanc     Élise
+## 33            Omar Ba      Omar
+## 34      ROBIN Rokhaya   Rokhaya
+## 35         Djibril Ba   Djibril
+## 36      nora   haddad      nora
+## 37     Pauline Haddad   Pauline
+## 38        chen   wang      chen
+## 39       Gaël Bernard      Gaël
+## 40    Valérie Bernard   Valérie
+## 41      awa   mercier       awa
+## 42    Baptiste Diallo  Baptiste
+## 43        MBAYE Fatou     Fatou
+## 44        DURAND Chen      Chen
+## 45  quentin   lefèvre   quentin
+## 46     Aminata Diallo   Aminata
+## 47          KONE Nora      Nora
+## 48 Chevalier, Aminata   Aminata
+## 49     Djibril Girard   Djibril
+## 50        Léa Le Goff       Léa
+## 51         Diop, Théo      Théo
+## 52         Fall, Dina      Dina
+## 53      Djibril Mbaye   Djibril
+## 54      awa   lefèvre       awa
+## 55        DIALLO Chen      Chen
+## 56        Rokhaya Sow   Rokhaya
+## 57      CLÉMENCE ROUX  CLÉMENCE
+## 58 Chevalier, Pauline   Pauline
+## 59    Chevalier, Inès      Inès
+## 60      DUPONT Wassim    Wassim</code></pre>
+<p>.b</p>
+<pre class="r"><code>num_valide = sum(!is.na(contacts_bruts$telephone))
+num_s06_07 = sum(str_detect(contacts_bruts$telephone, &quot;^(06|07)&quot;), na.rm = TRUE)</code></pre>
+<p>Il y a 57 numéros de téléphones valides</p>
+<p>Il y a 36 numéros de téléphones qui commencent soit par 06, soit par
+07.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>contacts_bruts |&gt; 
+  filter(!is.na(telephone), str_detect(telephone, &quot;^(01|02|03|04|05|06|07)&quot;)) |&gt; 
+  mutate(
+    zone = case_when(
+      str_sub(telephone, 1, 2) == &quot;01&quot; ~ &quot;01 : Île-de-France&quot;,
+      str_sub(telephone, 1, 2) == &quot;02&quot; ~ &quot;02 : Nord-Ouest&quot;,
+      str_sub(telephone, 1, 2) == &quot;03&quot; ~ &quot;03 : Nord-Est&quot;,
+      str_sub(telephone, 1, 2) == &quot;04&quot; ~ &quot;04 : Sud-Est&quot;,
+      str_sub(telephone, 1, 2) == &quot;05&quot; ~ &quot;05 : Sud-Ouest&quot;,
+      TRUE ~ &quot;Autre&quot; 
+    )) |&gt; 
+  group_by(zone) |&gt; 
+  summarise(nb_contacts = n()) </code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   zone               nb_contacts
+##   &lt;chr&gt;                    &lt;int&gt;
+## 1 01 : Île-de-France          11
+## 2 04 : Sud-Est                10
+## 3 Autre                       36</code></pre>
+<p>Sur tous les numéros valides (57), il y a 36 mobiles et 21 fixes.</p>
+</div>
+<div id="b5" class="section level2">
+<h2>B5</h2>
+<pre class="r"><code>contacts_bruts2 = contacts_bruts |&gt;
+  separate_wider_regex(adresse,
+    patterns = c(rue = &quot;.*&quot;, &quot;,\\s*&quot;, cp = &quot;\\d{5}&quot;, &quot;\\s+&quot;, ville = &quot;.*&quot;)) |&gt;
+  mutate(ville = str_to_title(ville),
+         departement = str_sub(cp, 1, 2))
+
+contacts_bruts2 |&gt; 
+  select(rue, ville, departement)</code></pre>
+<pre><code>## # A tibble: 60 × 3
+##    rue                          ville       departement
+##    &lt;chr&gt;                        &lt;chr&gt;       &lt;chr&gt;      
+##  1 1 bd Gambetta                Paris       75         
+##  2 38 impasse Pasteur           Lille       59         
+##  3 66 boulevard de la Paix      Paris       75         
+##  4 46 avenue de la Paix         Paris       75         
+##  5 9 boulevard de la République Toulouse    31         
+##  6 79 avenue de la République   Nantes      44         
+##  7 85 rue Gambetta              Toulouse    31         
+##  8 75 bd de la Paix             Montpellier 34         
+##  9 37 impasse Gambetta          Saint-Denis 93         
+## 10 29 Rue de la République      Marseille   13         
+## # ℹ 50 more rows</code></pre>
+<pre class="r"><code>contacts_bruts2 |&gt; 
+  group_by(ville) |&gt; 
+  summarise(
+    nombre_de_contacgt = n()
+  )</code></pre>
+<pre><code>## # A tibble: 12 × 2
+##    ville       nombre_de_contacgt
+##    &lt;chr&gt;                    &lt;int&gt;
+##  1 Bordeaux                     4
+##  2 Lille                        2
+##  3 Lyon                         5
+##  4 Marseille                    5
+##  5 Montpellier                  2
+##  6 Nantes                       5
+##  7 Nice                         4
+##  8 Paris                        9
+##  9 Rennes                       7
+## 10 Saint-Denis                  3
+## 11 Strasbourg                   6
+## 12 Toulouse                     8</code></pre>
+</div>
+<div id="b6" class="section level2">
+<h2>B6</h2>
+<ol style="list-style-type: lower-alpha">
+<li>Tableau du nombre de format de date :</li>
+</ol>
+<pre class="r"><code>contacts_bruts2 |&gt; 
+  summarise(
+    &quot;jj/mm/aaaa&quot; = sum(str_detect(inscription, &quot;^\\d{2}/\\d{2}/\\d{4}$&quot;)),
+    &quot;aaaa-mm-jj&quot; = sum(str_detect(inscription, &quot;^\\d{4}-\\d{2}-\\d{2}$&quot;)),
+    &quot;jj-mm-aa&quot; = sum(str_detect(inscription, &quot;^\\d{2}-\\d{2}-\\d{2}$&quot;))
+  )</code></pre>
+<pre><code>## # A tibble: 1 × 3
+##   `jj/mm/aaaa` `aaaa-mm-jj` `jj-mm-aa`
+##          &lt;int&gt;        &lt;int&gt;      &lt;int&gt;
+## 1           38           13          9</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>contacts_bruts3 = contacts_bruts2 |&gt; 
+  mutate(
+    inscription = suppressWarnings(case_when(
+      str_detect(inscription, &quot;^\\d{2}/\\d{2}/\\d{4}$&quot;) ~ dmy(inscription),
+      str_detect(inscription, &quot;^\\d{4}-\\d{2}-\\d{2}$&quot;) ~ ymd(inscription),
+      str_detect(inscription, &quot;^\\d{2}-\\d{2}-\\d{2}$&quot;) ~ dmy(inscription)
+    ))
+  )
+contacts_bruts3</code></pre>
+<pre><code>## # A tibble: 60 × 11
+##    id    nom    email telephone rue   cp    ville inscription nom_complet prenom
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;date&gt;      &lt;chr&gt;       &lt;chr&gt; 
+##  1 C001  fall   vale… &lt;NA&gt;      1 bd… 75020 Paris 2023-08-24  valérie   … valér…
+##  2 C002  GIRARD jade… 04 50 22… 38 i… 59000 Lille 2025-02-20  JADE GIRARD JADE  
+##  3 C003  Cheva… chen… 01 02 23… 66 b… 75011 Paris 2025-08-20  Chen Cheva… Chen  
+##  4 C004  ndiaye awa.… 01 98 84… 46 a… 75011 Paris 2024-09-02  awa   ndia… awa   
+##  5 C005  Mbaye  gael… 04 57 05… 9 bo… 31000 Toul… 2025-07-22  Gaël Mbaye  Gaël  
+##  6 C006  Benali rokh… 06 40 95… 79 a… 44000 Nant… 2025-02-20  Rokhaya Be… Rokha…
+##  7 C007  Faye   awa.… 07 24 33… 85 r… 31000 Toul… 2025-09-02  Awa Faye    Awa   
+##  8 C008  Garcia clem… 01 72 83… 75 b… 34000 Mont… 2025-09-05  Clémence G… Cléme…
+##  9 C009  Martin jade… 06 08 50… 37 i… 93200 Sain… 2025-03-02  Jade Martin Jade  
+## 10 C010  Wang   mous… 07 73 32… 29 R… 13005 Mars… 2023-07-14  Wang, Mous… Moussa
+## # ℹ 50 more rows
+## # ℹ 1 more variable: departement &lt;chr&gt;</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Tableau des inscriptions par année :</li>
+</ol>
+<pre class="r"><code>n_dates_na2 &lt;- sum(!is.na(contacts_bruts2$inscription))
+n_dates_na3 &lt;- sum(!is.na(contacts_bruts3$inscription))
+contacts_bruts3 |&gt; 
+  group_by(annee = year(inscription)) |&gt; 
+  summarise(
+    inscription = n()
+  )</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   annee inscription
+##   &lt;dbl&gt;       &lt;int&gt;
+## 1  2023          17
+## 2  2024          21
+## 3  2025          22</code></pre>
+<p>Avant le traitement on avait 60 date d’inscription et après on a
+toujours 60.</p>
+</div>
+<div id="b7" class="section level2">
+<h2>B7</h2>
+<pre class="r"><code>contacts_propres &lt;- contacts_bruts3 |&gt;
+  transmute(
+    id, prenom, nom,
+    email,
+    telephone, cp, ville, inscription
+  )
+
+dir.create(&quot;sorties&quot;, showWarnings = FALSE)
+write_csv(contacts_propres, &quot;sorties/contacts_propres.csv&quot;)
+
+n_complets &lt;- sum(complete.cases(contacts_propres))</code></pre>
+<p>Il y a 57 contacts complets sur 60.</p>
 </div>
 </div>
 

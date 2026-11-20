@@ -8,6 +8,7 @@ output:
 
 ```{r include=FALSE}
 library("tidyverse")
+library("lubridate")
 ```
 
 
@@ -138,3 +139,231 @@ str_detect(c("Photo", "photo"), "^(P|p)hoto")
 ```
 
 # Partie B
+
+## B1
+```{r}
+contacts_bruts <- read.csv("data/contacts_bruts.csv")
+head(contacts_bruts, 10)
+```
+Les ids suivent le même formats : "CXXX".
+
+Les différents formats des noms : "prenom nom", "PRENOM NOM", "Prenom Nom", "Prenom, Nom".
+
+Les différents formets de mails : "prenom.nom\@fournisseur.domain", "prenom.nomfournisseur.domain"
+
+Les différents formats de numéro de téléphone : "XX XX XX XX XX", "XXXXXXXXXX", "XX.XX.XX.XX.XX", "XX-XX-XX-XX-XX".
+
+Les différents formats de numéro d'adresse : "NUMERO lieu, CODEPOSTAL Ville", "NUMERO Lieu, CODEPOSTAL Ville", "NUMERO lieu, CODEPOSTAL VILLE"
+
+Les différents formats de date : "XX/XX/XXXX", "XXXX-XX-XX"
+
+## B2
+
+```{r}
+contacts_bruts <- contacts_bruts %>%
+  mutate(across(where(is.character), str_trim))
+
+contacts_bruts = contacts_bruts |> 
+  mutate(
+    nom_complet = nom,
+    nom = case_when(
+      str_detect(nom_complet, ",") ~ str_trim(str_remove(nom_complet, ",.*$")),
+      str_detect(nom_complet, "([A-Z]+\\s+)+[A-Z][a-z]+") ~ str_extract(nom_complet, "([[:upper:]])+"),
+      TRUE ~ str_trim(str_remove(nom_complet, "^\\S+\\s+"))
+    ),
+    prenom = case_when(
+      str_detect(nom_complet, ",") ~ str_trim(str_remove(nom_complet, "^.*,\\s*")),
+      str_detect(nom_complet, "([A-Z]+\\s+)+[A-Z][a-z]+") ~ str_trim(str_remove(nom_complet, "^\\S+\\s+")),
+      TRUE ~ word(nom_complet, 1)
+    )
+  )
+contacts_bruts
+```
+b.
+
+```{r}
+contacts_bruts |> 
+  mutate(
+    prenom = str_to_upper(substr(prenom, start = 1, stop =1)),
+    nom = str_to_upper(nom)
+  ) |> 
+  select(
+    prenom,
+    nom,
+    nom_complet
+  )
+```
+c.
+On peut voir que le nom à particule "LE GOFF" tous en majuscule pose problème avec notre regex.
+
+## B3
+
+a.
+```{r}
+contacts_bruts = contacts_bruts |> 
+  mutate(email = str_to_lower(email))
+
+req_email <- "^[a-z0-9._-]+@[a-z0-9._-]+\\.[a-z]{2,4}$"
+```
+
+
+b.
+```{r}
+n_invalide_mail <- sum(str_detect(contacts_bruts[["email"]], req_email, TRUE))
+```
+
+Il y a `r n_invalide_mail` emails invalides.
+
+```{r}
+contacts_bruts |> 
+  filter(
+    str_detect(contacts_bruts[["email"]], req_email, TRUE)
+  ) |> 
+  select(
+    nom_complet,
+    email
+  )
+```
+
+c.
+Top des domaines les plus frequemment utilisés.
+```{r}
+
+contacts_bruts |> 
+  filter(
+    str_detect(contacts_bruts[["email"]], req_email)
+  )|> 
+
+  group_by(extension =  str_match(email, "@([a-z0-9._-]+)\\.")[, 2]) |> 
+  summarise(
+    nb_contacts = n()
+  ) |> 
+  
+  arrange(desc(nb_contacts))
+```
+
+## B4
+```{r}
+contacts_bruts = contacts_bruts |> 
+  mutate(
+    telephone = str_replace(telephone, "^\\+33(\\(0\\))?\\s?", "0"),
+    
+    telephone = str_replace(telephone, "(\\d{2})(?:\\.|-)?(\\d{2})(?:\\.|-)?(\\d{2})(?:\\.|-)?(\\d{2})(?:\\.|-)?(\\d{2})", "\\1 \\2 \\3 \\4 \\5"),
+    
+    telephone = ifelse(
+      str_detect(telephone, "^0\\d(\\s\\d{2}){4}$"), 
+      telephone, 
+      NA
+    )
+  )
+contacts_bruts
+```
+
+.b
+
+```{r}
+num_valide = sum(!is.na(contacts_bruts$telephone))
+num_s06_07 = sum(str_detect(contacts_bruts$telephone, "^(06|07)"), na.rm = TRUE)
+```
+
+Il y a `r num_valide` numéros de téléphones valides
+
+Il y a `r num_s06_07` numéros de téléphones qui commencent soit par 06, soit par 07.
+ 
+ 
+c.
+```{r}
+contacts_bruts |> 
+  filter(!is.na(telephone), str_detect(telephone, "^(01|02|03|04|05|06|07)")) |> 
+  mutate(
+    zone = case_when(
+      str_sub(telephone, 1, 2) == "01" ~ "01 : Île-de-France",
+      str_sub(telephone, 1, 2) == "02" ~ "02 : Nord-Ouest",
+      str_sub(telephone, 1, 2) == "03" ~ "03 : Nord-Est",
+      str_sub(telephone, 1, 2) == "04" ~ "04 : Sud-Est",
+      str_sub(telephone, 1, 2) == "05" ~ "05 : Sud-Ouest",
+      TRUE ~ "Autre" 
+    )) |> 
+  group_by(zone) |> 
+  summarise(nb_contacts = n()) 
+```
+ 
+Sur tous les numéros valides (`r num_valide`), il y a `r paste0(sum(str_detect(contacts_bruts$telephone, "^(06|07)"), na.rm = TRUE), " mobiles et ", sum(str_detect(contacts_bruts$telephone, "^(01|02|03|04|05)"), na.rm = TRUE), " fixes.")`
+
+## B5
+
+```{r}
+contacts_bruts2 = contacts_bruts |>
+  separate_wider_regex(adresse,
+    patterns = c(rue = ".*", ",\\s*", cp = "\\d{5}", "\\s+", ville = ".*")) |>
+  mutate(ville = str_to_title(ville),
+         departement = str_sub(cp, 1, 2))
+
+contacts_bruts2 |> 
+  select(rue, ville, departement)
+```
+
+```{r}
+contacts_bruts2 |> 
+  group_by(ville) |> 
+  summarise(
+    nombre_de_contacgt = n()
+  )
+```
+
+## B6
+
+a.
+Tableau du nombre de format de date : 
+```{r}
+contacts_bruts2 |> 
+  summarise(
+    "jj/mm/aaaa" = sum(str_detect(inscription, "^\\d{2}/\\d{2}/\\d{4}$")),
+    "aaaa-mm-jj" = sum(str_detect(inscription, "^\\d{4}-\\d{2}-\\d{2}$")),
+    "jj-mm-aa" = sum(str_detect(inscription, "^\\d{2}-\\d{2}-\\d{2}$"))
+  )
+```
+b.
+
+```{r}
+contacts_bruts3 = contacts_bruts2 |> 
+  mutate(
+    inscription = suppressWarnings(case_when(
+      str_detect(inscription, "^\\d{2}/\\d{2}/\\d{4}$") ~ dmy(inscription),
+      str_detect(inscription, "^\\d{4}-\\d{2}-\\d{2}$") ~ ymd(inscription),
+      str_detect(inscription, "^\\d{2}-\\d{2}-\\d{2}$") ~ dmy(inscription)
+    ))
+  )
+contacts_bruts3
+```
+
+c.
+Tableau des inscriptions par année : 
+```{r}
+n_dates_na2 <- sum(!is.na(contacts_bruts2$inscription))
+n_dates_na3 <- sum(!is.na(contacts_bruts3$inscription))
+contacts_bruts3 |> 
+  group_by(annee = year(inscription)) |> 
+  summarise(
+    inscription = n()
+  )
+```
+Avant le traitement on avait `r n_dates_na2` date d'inscription et après on a toujours `r n_dates_na3`.
+
+## B7
+
+```{r}
+contacts_propres <- contacts_bruts3 |>
+  transmute(
+    id, prenom, nom,
+    email,
+    telephone, cp, ville, inscription
+  )
+
+dir.create("sorties", showWarnings = FALSE)
+write_csv(contacts_propres, "sorties/contacts_propres.csv")
+
+n_complets <- sum(complete.cases(contacts_propres))
+```
+
+Il y a `r n_complets` contacts complets sur `r nrow(contacts_propres)`.
